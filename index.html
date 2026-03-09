@@ -3,761 +3,591 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cronologia della Storia</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<title>Collezione Filatelica — Stefano</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --gold: #c9a84c;
-    --gold-light: #e8c97a;
-    --gold-dim: rgba(201,168,76,0.18);
-    --bg: #0b0b0f;
-    --surface: #13131a;
-    --text: #e8e2d5;
-    --text-dim: #7a7468;
-    --line: rgba(201,168,76,0.25);
-  }
+:root{--cream:#f5f0e8;--parchment:#e8dfc8;--ink:#1a1410;--sepia:#6b4c2a;--rust:#9b3a1e;--gold:#c4922a;--faded:#8c7b6a;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--cream);color:var(--ink);font-family:'EB Garamond',serif;font-size:16px;line-height:1.6;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:999;}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+header{background:var(--ink);color:var(--cream);padding:2.2rem 2rem 1.8rem;text-align:center;position:relative;overflow:hidden;}
+header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(196,146,42,0.04) 10px,rgba(196,146,42,0.04) 20px);}
+.header-ornament{color:var(--gold);font-size:.85rem;letter-spacing:.4em;text-transform:uppercase;display:block;margin-bottom:.5rem;opacity:.8;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,3.2rem);font-weight:400;position:relative;}
+header h1 em{color:var(--gold);font-style:italic;}
+.header-sub{margin-top:.4rem;color:rgba(245,240,232,.5);font-style:italic;font-size:.9rem;}
+.header-rule{width:90px;height:1px;background:var(--gold);margin:1rem auto 0;opacity:.45;}
+.admin-btn{position:absolute;top:1rem;right:1.2rem;background:rgba(245,240,232,.07);border:1px solid rgba(196,146,42,.3);color:rgba(196,146,42,.7);font-size:.78rem;padding:.28rem .65rem;cursor:pointer;border-radius:2px;letter-spacing:.05em;transition:all .2s;z-index:10;}
+.admin-btn:hover{background:rgba(196,146,42,.15);color:var(--gold);}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    overflow-x: hidden;
-  }
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:1px;background:rgba(107,76,42,.12);border-bottom:1px solid rgba(107,76,42,.12);}
+.stat-cell{background:var(--cream);padding:.9rem 1rem;text-align:center;}
+.stat-number{font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--rust);display:block;line-height:1;margin-bottom:.18rem;}
+.stat-label{font-size:.72rem;color:var(--faded);letter-spacing:.07em;text-transform:uppercase;}
 
-  /* ─── HERO ─── */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    position: relative;
-    padding: 2rem;
-    background:
-      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(201,168,76,0.07) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 30% at 80% 80%, rgba(80,60,140,0.08) 0%, transparent 60%);
-  }
-  .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-      repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(201,168,76,0.04) 60px),
-      repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(201,168,76,0.04) 60px);
-    pointer-events: none;
-  }
-  .hero-eyebrow {
-    font-family: 'DM Mono', monospace;
-    font-size: .72rem;
-    letter-spacing: .3em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 1.6rem;
-    opacity: 0;
-    animation: fadeUp .8s .2s forwards;
-  }
-  .hero-title {
-    font-size: clamp(3rem, 8vw, 7rem);
-    font-weight: 300;
-    line-height: 1;
-    color: var(--text);
-    opacity: 0;
-    animation: fadeUp .9s .4s forwards;
-  }
-  .hero-title em { font-style: italic; color: var(--gold-light); }
-  .hero-sub {
-    margin-top: 1.8rem;
-    font-size: 1.2rem;
-    font-weight: 300;
-    color: var(--text-dim);
-    max-width: 480px;
-    line-height: 1.6;
-    opacity: 0;
-    animation: fadeUp .9s .6s forwards;
-  }
-  .scroll-cue {
-    position: absolute;
-    bottom: 2.4rem;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: .5rem;
-    opacity: 0;
-    animation: fadeIn 1s 1.2s forwards;
-  }
-  .scroll-cue span {
-    font-family: 'DM Mono', monospace;
-    font-size: .65rem;
-    letter-spacing: .22em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-  }
-  .scroll-line {
-    width: 1px; height: 50px;
-    background: linear-gradient(to bottom, var(--gold), transparent);
-    animation: scrollPulse 2s ease-in-out infinite;
-  }
+.toolbar{background:var(--parchment);border-bottom:1px solid rgba(107,76,42,.18);padding:.8rem 1.2rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(26,20,16,.07);display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;}
+.search-wrap{position:relative;flex:1;min-width:160px;}
+.search-wrap input{width:100%;padding:.4rem .8rem .4rem 2rem;border:1px solid rgba(107,76,42,.3);background:rgba(255,255,255,.7);font-family:'EB Garamond',serif;font-size:.92rem;color:var(--ink);border-radius:2px;outline:none;}
+.search-wrap input:focus{border-color:var(--sepia);}
+.si{position:absolute;left:.6rem;top:50%;transform:translateY(-50%);color:var(--faded);font-size:.85rem;pointer-events:none;}
+select{font-family:'EB Garamond',serif;font-size:.85rem;padding:.38rem 1.4rem .38rem .8rem;border:1px solid rgba(107,76,42,.3);background:transparent;color:var(--sepia);cursor:pointer;border-radius:2px;transition:all .18s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b4c2a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .5rem center;}
+select:focus{background-color:var(--sepia);color:var(--cream);}
+.count-badge{font-size:.8rem;color:var(--faded);font-style:italic;white-space:nowrap;margin-left:auto;}
 
-  /* ─── FILTER BAR ─── */
-  .filter-bar {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(11,11,15,0.92);
-    backdrop-filter: blur(18px);
-    border-bottom: 1px solid var(--line);
-    padding: .9rem 2rem;
-    display: flex;
-    justify-content: center;
-    gap: .6rem;
-    flex-wrap: wrap;
-  }
-  .filter-btn {
-    font-family: 'DM Mono', monospace;
-    font-size: .68rem;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    padding: .45rem 1.1rem;
-    border: 1px solid rgba(201,168,76,0.3);
-    background: transparent;
-    color: var(--text-dim);
-    cursor: pointer;
-    border-radius: 2px;
-    transition: all .25s;
-  }
-  .filter-btn:hover, .filter-btn.active {
-    background: var(--gold-dim);
-    border-color: var(--gold);
-    color: var(--gold-light);
-  }
+main{max-width:1300px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+.stamp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:1.8rem;margin-bottom:2.5rem;}
+.stamp-card{cursor:pointer;transition:transform .28s ease;animation:fadeUp .4s ease both;}
+.stamp-card:hover{transform:translateY(-5px);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 
-  #event-count {
-    font-family: 'DM Mono', monospace;
-    font-size: .65rem;
-    letter-spacing: .12em;
-    color: var(--text-dim);
-    text-align: center;
-    padding: .7rem;
-  }
+.stamp-frame{background:white;padding:.75rem;position:relative;margin-bottom:.8rem;box-shadow:0 3px 14px rgba(26,20,16,.12),0 1px 3px rgba(26,20,16,.07);--p:6px;--pg:12px;}
+.stamp-frame::before{content:'';position:absolute;left:0;right:0;top:calc(var(--p)/-2);height:var(--p);background:radial-gradient(circle,var(--cream) 45%,transparent 46%) center/var(--pg) var(--p);background-repeat:repeat-x;}
+.stamp-frame::after{content:'';position:absolute;left:0;right:0;bottom:calc(var(--p)/-2);height:var(--p);background:radial-gradient(circle,var(--cream) 45%,transparent 46%) center/var(--pg) var(--p);background-repeat:repeat-x;}
+.perf-l,.perf-r{position:absolute;top:0;bottom:0;width:var(--p);background:radial-gradient(circle,var(--cream) 45%,transparent 46%) center/var(--p) var(--pg);background-repeat:repeat-y;}
+.perf-l{left:calc(var(--p)/-2);}.perf-r{right:calc(var(--p)/-2);}
+.stamp-inner{border:1px solid rgba(26,20,16,.09);overflow:hidden;position:relative;aspect-ratio:3/4;background:#ede8dc;display:flex;align-items:center;justify-content:center;}
+.stamp-img{width:100%;height:100%;object-fit:cover;display:block;filter:sepia(6%);transition:filter .3s;}
+.stamp-card:hover .stamp-img{filter:sepia(0%);}
+.stamp-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;padding:.8rem;background:linear-gradient(145deg,#e8dfc8,#d4c9a0);}
+.ph-flag{font-size:1.8rem;}.ph-label{font-family:'Playfair Display',serif;font-size:.62rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#2d1f0e;text-align:center;}
+.ph-val{font-family:'Playfair Display',serif;font-size:.9rem;color:var(--rust);font-weight:700;}
+.stamp-yr{position:absolute;bottom:4px;right:6px;font-size:.58rem;color:rgba(26,20,16,.4);font-style:italic;}
+.stamp-title{font-family:'Playfair Display',serif;font-size:.88rem;font-weight:400;color:var(--ink);margin-bottom:.08rem;line-height:1.25;}
+.stamp-sub{font-size:.78rem;color:var(--faded);font-style:italic;margin-bottom:.4rem;}
+.stamp-tags{display:flex;flex-wrap:wrap;gap:.28rem;}
+.tag{font-size:.65rem;padding:.1rem .5rem;border-radius:2px;letter-spacing:.04em;text-transform:uppercase;}
+.tag-serie{background:rgba(196,146,42,.12);color:#7a5a10;}
+.tag-condiz{background:rgba(155,58,30,.1);color:var(--rust);}
+.tag-anno{background:rgba(26,20,16,.07);color:var(--sepia);}
+.cond-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:3px;vertical-align:middle;}
+.cond-fds{background:#4a9e6b;}.cond-spl{background:#c4922a;}.cond-bb{background:#9b3a1e;}
 
-  /* ─── TIMELINE ─── */
-  .timeline-section {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 1rem 2rem 10rem;
-    position: relative;
-  }
-  .timeline-section::before {
-    content: '';
-    position: absolute;
-    top: 0; bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1px;
-    background: linear-gradient(to bottom, transparent 0%, var(--gold) 2%, var(--gold) 98%, transparent 100%);
-    opacity: .28;
-  }
+#empty-state{text-align:center;padding:4rem 2rem;color:var(--faded);display:none;}
+#empty-state .ei{font-size:3rem;margin-bottom:1rem;}
+#empty-state p:first-of-type{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--sepia);margin-bottom:.35rem;}
 
-  .era-label {
-    text-align: center;
-    position: relative;
-    z-index: 2;
-    margin: 4rem 0 2.5rem;
-  }
-  .era-label:first-child { margin-top: 2rem; }
-  .era-label span {
-    font-family: 'DM Mono', monospace;
-    font-size: .7rem;
-    letter-spacing: .35em;
-    text-transform: uppercase;
-    color: var(--gold);
-    background: var(--bg);
-    padding: .4rem 1.4rem;
-    border: 1px solid var(--line);
-    border-radius: 2px;
-  }
+.pagination{display:flex;justify-content:center;align-items:center;gap:.35rem;flex-wrap:wrap;margin-top:.5rem;}
+.pg-btn{font-family:'EB Garamond',serif;font-size:.88rem;padding:.32rem .75rem;border:1px solid rgba(107,76,42,.3);background:transparent;color:var(--sepia);cursor:pointer;border-radius:2px;transition:all .15s;}
+.pg-btn:hover,.pg-btn.active{background:var(--sepia);color:var(--cream);border-color:var(--sepia);}
+.pg-btn:disabled{opacity:.3;cursor:default;}
+.pg-info{font-size:.82rem;color:var(--faded);font-style:italic;padding:0 .4rem;}
 
-  .event {
-    display: grid;
-    grid-template-columns: 1fr 56px 1fr;
-    align-items: start;
-    margin-bottom: 2.8rem;
-    opacity: 0;
-    transform: translateY(22px);
-    transition: opacity .5s ease, transform .5s ease;
-  }
-  .event.visible { opacity: 1; transform: translateY(0); }
+/* DETAIL MODAL */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(26,20,16,.78);z-index:500;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(4px);}
+.modal-backdrop.open{display:flex;}
+.modal{background:var(--cream);max-width:520px;width:100%;position:relative;box-shadow:0 24px 70px rgba(26,20,16,.45);animation:mIn .22s ease;overflow:hidden;max-height:90vh;display:flex;flex-direction:column;}
+@keyframes mIn{from{opacity:0;transform:scale(.95) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.modal-img-wrap{height:190px;background:#1a1410;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.modal-img-wrap img{width:100%;height:100%;object-fit:contain;}
+.modal-img-ph{font-size:3rem;opacity:.22;}
+.modal-body{padding:1.6rem 1.8rem 1.8rem;overflow-y:auto;}
+.modal-close{position:absolute;top:.65rem;right:.75rem;background:rgba(26,20,16,.55);border:none;color:var(--cream);font-size:1rem;cursor:pointer;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:10;}
+.modal h2{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:400;margin-bottom:.2rem;color:var(--ink);}
+.modal-year{color:var(--faded);font-style:italic;margin-bottom:1rem;font-size:.88rem;}
+.modal-row{display:flex;justify-content:space-between;padding:.42rem 0;border-bottom:1px solid rgba(107,76,42,.1);font-size:.9rem;}
+.modal-row:last-child{border-bottom:none;}
+.modal-row-label{color:var(--faded);}
+.modal-row-value{font-weight:500;color:var(--ink);text-align:right;max-width:58%;}
+.modal-note{margin-top:.9rem;padding:.75rem .9rem;background:rgba(107,76,42,.06);font-style:italic;font-size:.85rem;color:var(--sepia);border-left:2px solid var(--gold);}
+.modal-edit-btn{margin-top:1rem;width:100%;padding:.5rem;background:transparent;border:1px solid rgba(107,76,42,.3);color:var(--sepia);font-family:'EB Garamond',serif;font-size:.9rem;cursor:pointer;border-radius:2px;transition:all .18s;}
+.modal-edit-btn:hover{background:var(--sepia);color:var(--cream);}
 
-  .event.right .card { grid-column: 3; }
-  .event.right .spacer { grid-column: 1; }
-  .event.left  .card { grid-column: 1; }
+footer{background:var(--ink);color:rgba(245,240,232,.38);text-align:center;padding:1.2rem;font-style:italic;font-size:.8rem;}
+footer span{color:var(--gold);opacity:.7;}
 
-  .card {
-    background: var(--surface);
-    border: 1px solid rgba(201,168,76,0.12);
-    border-radius: 4px;
-    padding: 1.4rem 1.6rem;
-    position: relative;
-    transition: border-color .3s, box-shadow .3s;
-  }
-  .card:hover {
-    border-color: rgba(201,168,76,0.4);
-    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
-  }
-  .card::after {
-    content: '';
-    position: absolute;
-    top: 1.8rem;
-    width: 28px;
-    height: 1px;
-    background: var(--line);
-  }
-  .event.right .card::after { left: -29px; }
-  .event.left  .card::after { right: -29px; }
+/* PASSWORD OVERLAY */
+.pwd-overlay{position:fixed;inset:0;z-index:900;background:rgba(26,20,16,.92);display:flex;align-items:center;justify-content:center;}
+.pwd-box{background:var(--ink);padding:2.5rem;max-width:340px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center;border:1px solid rgba(196,146,42,.15);}
+.pwd-box h3{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:400;color:var(--gold);margin-bottom:.4rem;}
+.pwd-box p{font-size:.85rem;color:rgba(245,240,232,.45);font-style:italic;margin-bottom:1.2rem;}
+.pwd-box input{width:100%;padding:.55rem .8rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:var(--cream);font-family:'EB Garamond',serif;font-size:1rem;border-radius:2px;outline:none;text-align:center;margin-bottom:.8rem;letter-spacing:.15em;}
+.pwd-box input:focus{border-color:rgba(196,146,42,.5);}
+.pwd-btn{width:100%;padding:.55rem;background:rgba(196,146,42,.2);border:1px solid rgba(196,146,42,.4);color:var(--gold);font-family:'EB Garamond',serif;font-size:.95rem;cursor:pointer;border-radius:2px;transition:all .2s;}
+.pwd-btn:hover{background:rgba(196,146,42,.35);}
+.pwd-error{font-size:.82rem;color:#e07060;margin-top:.55rem;}
 
-  .node {
-    grid-column: 2;
-    display: flex;
-    justify-content: center;
-    padding-top: 1.6rem;
-  }
-  .node-dot {
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: var(--bg);
-    border: 2px solid var(--gold);
-    box-shadow: 0 0 0 4px rgba(201,168,76,0.1);
-    flex-shrink: 0;
-    transition: transform .3s, box-shadow .3s;
-  }
-  .event:hover .node-dot {
-    transform: scale(1.5);
-    box-shadow: 0 0 0 8px rgba(201,168,76,0.08), 0 0 18px rgba(201,168,76,0.3);
-  }
+/* ADMIN PANEL */
+.admin-panel{display:none;position:fixed;inset:0;z-index:800;background:rgba(26,20,16,.82);backdrop-filter:blur(5px);align-items:flex-start;justify-content:flex-end;padding:1rem;}
+.admin-panel.open{display:flex;}
+.admin-sidebar{background:var(--ink);color:var(--cream);width:100%;max-width:480px;height:calc(100vh - 2rem);border-radius:3px;display:flex;flex-direction:column;overflow:hidden;box-shadow:-10px 0 50px rgba(0,0,0,.4);animation:slideIn .25s ease;}
+@keyframes slideIn{from{transform:translateX(30px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+.admin-header{padding:1.1rem 1.4rem;border-bottom:1px solid rgba(196,146,42,.2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.admin-header h3{font-family:'Playfair Display',serif;font-weight:400;font-size:1.05rem;color:var(--gold);}
+.admin-close{background:none;border:none;color:rgba(245,240,232,.45);font-size:1.3rem;cursor:pointer;line-height:1;}
+.admin-close:hover{color:var(--cream);}
+.admin-tabs{display:flex;border-bottom:1px solid rgba(196,146,42,.12);flex-shrink:0;}
+.admin-tab{flex:1;padding:.65rem;text-align:center;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;color:rgba(245,240,232,.4);border:none;background:none;font-family:'EB Garamond',serif;transition:all .18s;border-bottom:2px solid transparent;}
+.admin-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.admin-body{flex:1;overflow-y:auto;padding:1.1rem 1.4rem;}
 
-  .card-year {
-    font-family: 'DM Mono', monospace;
-    font-size: .67rem;
-    letter-spacing: .2em;
-    color: var(--gold);
-    margin-bottom: .4rem;
-  }
-  .card-icon { font-size: 1.5rem; margin-bottom: .45rem; display: block; }
-  .card-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    line-height: 1.25;
-    color: var(--text);
-    margin-bottom: .5rem;
-  }
-  .card-body {
-    font-size: .95rem;
-    font-weight: 300;
-    line-height: 1.65;
-    color: var(--text-dim);
-  }
-  .card-tag {
-    display: inline-block;
-    margin-top: .75rem;
-    font-family: 'DM Mono', monospace;
-    font-size: .6rem;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    padding: .2rem .6rem;
-    border-radius: 2px;
-    border: 1px solid;
-  }
+/* Admin list */
+.admin-search{width:100%;padding:.38rem .6rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:var(--cream);font-family:'EB Garamond',serif;font-size:.88rem;border-radius:2px;outline:none;margin-bottom:.8rem;}
+.admin-search:focus{border-color:rgba(196,146,42,.4);}
+.adm-count{font-size:.75rem;color:rgba(245,240,232,.32);font-style:italic;margin-bottom:.5rem;}
+.admin-list-item{display:flex;align-items:center;gap:.6rem;padding:.55rem 0;border-bottom:1px solid rgba(255,255,255,.06);}
+.admin-list-item:last-child{border-bottom:none;}
+.ali-info{flex:1;}
+.ali-title{font-size:.88rem;color:var(--cream);}
+.ali-meta{font-size:.75rem;color:rgba(245,240,232,.38);font-style:italic;}
+.ali-btn{background:none;border:1px solid rgba(255,255,255,.13);color:rgba(245,240,232,.55);font-size:.72rem;padding:.2rem .5rem;cursor:pointer;border-radius:2px;transition:all .15s;font-family:'EB Garamond',serif;}
+.ali-btn:hover{background:rgba(255,255,255,.1);color:var(--cream);}
+.ali-btn.del:hover{border-color:#c0392b;color:#e74c3c;}
 
-  .tag-scienza  { color: #7ec8e3; border-color: rgba(126,200,227,.3); background: rgba(126,200,227,.06); }
-  .tag-storia   { color: #e38a7e; border-color: rgba(227,138,126,.3); background: rgba(227,138,126,.06); }
-  .tag-arte     { color: #a07ee3; border-color: rgba(160,126,227,.3); background: rgba(160,126,227,.06); }
-  .tag-esplora  { color: #7ee3a0; border-color: rgba(126,227,160,.3); background: rgba(126,227,160,.06); }
-  .tag-guerra   { color: #e3c07e; border-color: rgba(227,192,126,.3); background: rgba(227,192,126,.06); }
-  .tag-politica { color: #e3a07e; border-color: rgba(227,160,126,.3); background: rgba(227,160,126,.06); }
-  .tag-tech     { color: #7ecce3; border-color: rgba(126,204,227,.3); background: rgba(126,204,227,.06); }
-  .tag-spazio   { color: #c07ee3; border-color: rgba(192,126,227,.3); background: rgba(192,126,227,.06); }
+/* Admin form */
+.new-btn{width:100%;padding:.5rem;background:rgba(196,146,42,.12);border:1px solid rgba(196,146,42,.3);color:var(--gold);font-family:'EB Garamond',serif;font-size:.88rem;cursor:pointer;border-radius:2px;margin-bottom:1rem;transition:all .2s;}
+.new-btn:hover{background:rgba(196,146,42,.22);}
+.form-group{margin-bottom:.8rem;}
+.form-group label{display:block;font-size:.73rem;letter-spacing:.07em;text-transform:uppercase;color:rgba(245,240,232,.45);margin-bottom:.28rem;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:.42rem .6rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);color:var(--cream);font-family:'EB Garamond',serif;font-size:.9rem;border-radius:2px;outline:none;transition:border-color .2s;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:rgba(196,146,42,.5);}
+.form-group textarea{resize:vertical;min-height:65px;}
+.form-group select option{background:#1a1410;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;}
+.form-actions{display:flex;gap:.55rem;margin-top:1.1rem;}
+.btn-save{flex:1;padding:.5rem;background:rgba(45,122,79,.28);border:1px solid rgba(45,122,79,.45);color:#5dba8a;font-family:'EB Garamond',serif;font-size:.9rem;cursor:pointer;border-radius:2px;transition:all .2s;}
+.btn-save:hover{background:rgba(45,122,79,.45);}
+.btn-cancel{padding:.5rem .9rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);color:rgba(245,240,232,.45);font-family:'EB Garamond',serif;font-size:.9rem;cursor:pointer;border-radius:2px;}
+.btn-cancel:hover{background:rgba(255,255,255,.1);color:var(--cream);}
+.adm-status{padding:.55rem .75rem;border-radius:2px;font-size:.83rem;margin-top:.75rem;display:none;}
+.adm-status.ok{background:rgba(45,122,79,.2);border:1px solid rgba(45,122,79,.38);color:#5dba8a;display:block;}
+.adm-status.err{background:rgba(155,58,30,.2);border:1px solid rgba(155,58,30,.38);color:#e07060;display:block;}
+.adm-status.loading{background:rgba(196,146,42,.13);border:1px solid rgba(196,146,42,.28);color:var(--gold);display:block;}
 
-  #no-results {
-    text-align: center;
-    padding: 4rem 2rem;
-    font-family: 'DM Mono', monospace;
-    font-size: .75rem;
-    letter-spacing: .15em;
-    color: var(--text-dim);
-    display: none;
-  }
+/* Settings */
+.token-box{padding:.9rem;background:rgba(196,146,42,.07);border:1px solid rgba(196,146,42,.18);border-radius:2px;margin-bottom:1rem;}
+.token-box label{display:block;font-size:.73rem;letter-spacing:.06em;text-transform:uppercase;color:rgba(196,146,42,.65);margin-bottom:.38rem;}
+.token-box input{width:100%;padding:.38rem .6rem;background:rgba(0,0,0,.3);border:1px solid rgba(196,146,42,.22);color:var(--cream);font-family:monospace;font-size:.78rem;border-radius:2px;outline:none;}
+.token-box input:focus{border-color:rgba(196,146,42,.45);}
+.token-hint{font-size:.73rem;color:rgba(245,240,232,.3);font-style:italic;margin-top:.4rem;line-height:1.45;}
+.logout-btn{width:100%;padding:.5rem;background:transparent;border:1px solid rgba(155,58,30,.35);color:#c0614a;font-family:'EB Garamond',serif;font-size:.88rem;cursor:pointer;border-radius:2px;margin-top:1rem;transition:all .2s;}
+.logout-btn:hover{background:rgba(155,58,30,.15);}
+.settings-sep{border:none;border-top:1px solid rgba(255,255,255,.07);margin:1.2rem 0;}
 
-  footer {
-    text-align: center;
-    padding: 3rem 2rem;
-    border-top: 1px solid var(--line);
-    font-family: 'DM Mono', monospace;
-    font-size: .68rem;
-    letter-spacing: .15em;
-    color: var(--text-dim);
-    text-transform: uppercase;
-  }
-
-  @keyframes fadeUp  { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
-  @keyframes scrollPulse { 0%,100%{opacity:.4} 50%{opacity:1} }
-
-  @media (max-width: 700px) {
-    .timeline-section::before { left: 24px; }
-    .event { grid-template-columns: 48px 1fr; }
-    .event .node { grid-column: 1; grid-row: 1; }
-    .event.right .card,
-    .event.left  .card { grid-column: 2; grid-row: 1; }
-    .event.right .spacer { display: none; }
-    .event.right .card::after,
-    .event.left  .card::after { left: -24px; right: auto; width: 20px; }
-  }
+@media(max-width:600px){
+  .toolbar{flex-direction:column;}
+  .count-badge{margin-left:0;}
+  .stamp-grid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:1.2rem;}
+  .admin-sidebar{max-width:100%;}
+  .form-row{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
 
-<section class="hero">
-  <p class="hero-eyebrow">Dalla Preistoria al presente</p>
-  <h1 class="hero-title">La <em>Storia</em><br>dell'Umanità</h1>
-  <p class="hero-sub">Un viaggio attraverso gli eventi che hanno plasmato il mondo in cui viviamo.</p>
-  <div class="scroll-cue">
-    <span>Scorri</span>
-    <div class="scroll-line"></div>
-  </div>
-</section>
+<header>
+  <button class="admin-btn" onclick="openAdminAuth()">🔐 Admin</button>
+  <span class="header-ornament">✦ Collezione Privata ✦</span>
+  <h1>Filatelia <em>Italiana</em></h1>
+  <p class="header-sub">Repubblica Italiana · 1996 – 2025</p>
+  <div class="header-rule"></div>
+</header>
 
-<div class="filter-bar">
-  <button class="filter-btn active" data-filter="all">Tutti</button>
-  <button class="filter-btn" data-filter="storia">Storia</button>
-  <button class="filter-btn" data-filter="scienza">Scienza</button>
-  <button class="filter-btn" data-filter="arte">Arte &amp; Cultura</button>
-  <button class="filter-btn" data-filter="esplora">Esplorazioni</button>
-  <button class="filter-btn" data-filter="guerra">Guerra</button>
-  <button class="filter-btn" data-filter="politica">Politica</button>
-  <button class="filter-btn" data-filter="tech">Tecnologia</button>
-  <button class="filter-btn" data-filter="spazio">Spazio</button>
+<div class="stats-bar">
+  <div class="stat-cell"><span class="stat-number" id="s-tot">—</span><span class="stat-label">Esemplari</span></div>
+  <div class="stat-cell"><span class="stat-number" id="s-fds">—</span><span class="stat-label">FDS / SPL</span></div>
+  <div class="stat-cell"><span class="stat-number" id="s-serie">—</span><span class="stat-label">Serie</span></div>
+  <div class="stat-cell"><span class="stat-number" id="s-anni">—</span><span class="stat-label">Anni coperti</span></div>
 </div>
 
-<div id="event-count"></div>
-<section class="timeline-section" id="timeline"></section>
-<div id="no-results">Nessun evento trovato per questa categoria.</div>
+<div class="toolbar">
+  <div class="search-wrap">
+    <span class="si">🔍</span>
+    <input type="text" id="search" placeholder="Cerca francobollo, serie, Sassone…" oninput="applyFilters()">
+  </div>
+  <select id="fil-serie" onchange="applyFilters()"><option value="">Tutte le serie</option></select>
+  <select id="fil-anno" onchange="applyFilters()"><option value="">Tutti gli anni</option></select>
+  <select id="fil-cond" onchange="applyFilters()">
+    <option value="">Condizione</option>
+    <option value="fds">FDS</option>
+    <option value="spl">SPL</option>
+    <option value="bb">BB</option>
+  </select>
+  <select id="fil-sort" onchange="applyFilters()">
+    <option value="anno-asc">Anno ↑</option>
+    <option value="anno-desc">Anno ↓</option>
+    <option value="titolo">Titolo A-Z</option>
+    <option value="serie">Serie A-Z</option>
+  </select>
+  <span class="count-badge" id="count-badge"></span>
+</div>
 
-<footer><p>Cronologia della Storia Universale &nbsp;·&nbsp; Scorri, filtra, esplora</p></footer>
+<main>
+  <div class="stamp-grid" id="grid"></div>
+  <div id="empty-state">
+    <div class="ei">📭</div>
+    <p>Nessun risultato</p>
+    <p style="font-style:italic;font-size:.88rem;">Prova a modificare i filtri.</p>
+  </div>
+  <div class="pagination" id="pagination"></div>
+</main>
+
+<!-- Detail modal -->
+<div class="modal-backdrop" id="modal" onclick="if(event.target.id==='modal')closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-img-wrap" id="m-img"></div>
+    <div class="modal-body">
+      <h2 id="m-title"></h2>
+      <p class="modal-year" id="m-year"></p>
+      <div id="m-rows"></div>
+      <div class="modal-note" id="m-note" style="display:none;"></div>
+      <button class="modal-edit-btn" id="m-edit-btn" style="display:none;" onclick="editFromModal()">✏️ Modifica questo francobollo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Password overlay -->
+<div class="pwd-overlay" id="pwd-overlay" style="display:none;">
+  <div class="pwd-box">
+    <h3>🔐 Pannello Admin</h3>
+    <p>Inserisci la password per accedere</p>
+    <input type="password" id="pwd-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPwd()">
+    <button class="pwd-btn" onclick="checkPwd()">Accedi</button>
+    <div class="pwd-error" id="pwd-error" style="display:none;">Password errata. Riprova.</div>
+  </div>
+</div>
+
+<!-- Admin panel -->
+<div class="admin-panel" id="admin-panel">
+  <div class="admin-sidebar">
+    <div class="admin-header">
+      <h3>⚙️ Pannello Admin</h3>
+      <button class="admin-close" onclick="closeAdmin()">×</button>
+    </div>
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchTab('list',this)">Elenco</button>
+      <button class="admin-tab" onclick="switchTab('form',this)">Aggiungi / Modifica</button>
+      <button class="admin-tab" onclick="switchTab('settings',this)">Impostazioni</button>
+    </div>
+    <div class="admin-body" id="admin-body"></div>
+  </div>
+</div>
+
+<footer>Collezione di <span>Stefano</span> &mdash; aggiornata a marzo 2026</footer>
 
 <script>
-// ════════════════════════════════════════════════════════════
-//  📌 DATI EVENTI — aggiungi qui nuovi eventi con una riga!
-//
-//  Campi obbligatori:
-//    era    → nome del gruppo/era (stringa libera)
-//    year   → anno o periodo (stringa)
-//    icon   → emoji rappresentativa
-//    cat    → categoria: storia | scienza | arte | esplora |
-//              guerra | politica | tech | spazio
-//    title  → titolo breve
-//    body   → descrizione (2-4 righe)
-// ════════════════════════════════════════════════════════════
-const EVENTS = [
-
-  // ── PREISTORIA ──────────────────────────────
-  { era:'Preistoria', year:'~3,3 milioni di anni fa', icon:'🪨', cat:'storia',
-    title:'Primi Utensili in Pietra',
-    body:'In Africa orientale compaiono i primi strumenti litici della cultura Oldowaiana. Gli ominidi iniziano a trasformare la natura con la tecnica, ponendo le basi dell\'intelligenza umana.' },
-
-  { era:'Preistoria', year:'~200.000 a.C.', icon:'🦴', cat:'storia',
-    title:'Homo Sapiens in Africa',
-    body:'L\'Homo Sapiens emerge in Africa. Anatomicamente moderno, dotato di linguaggio simbolico e capacità di pianificazione a lungo termine: è l\'inizio della nostra specie.' },
-
-  { era:'Preistoria', year:'~70.000 a.C.', icon:'🧠', cat:'storia',
-    title:'La Grande Migrazione',
-    body:'Dall\'Africa, l\'Homo Sapiens si diffonde in Asia, Europa e Oceania. In poche decine di millenni colonizza l\'intero pianeta, adattandosi a climi e ambienti radicalmente diversi.' },
-
-  { era:'Preistoria', year:'~40.000 a.C.', icon:'🎨', cat:'arte',
-    title:'Arte Rupestre',
-    body:'Le grotte di Altamira, Lascaux e Chauvet si riempiono di pitture straordinarie: bisonti, cervi, mani in negativo. Il pensiero simbolico umano esplode in tutta la sua potenza.' },
-
-  { era:'Preistoria', year:'~10.000 a.C.', icon:'🌾', cat:'storia',
-    title:'Rivoluzione Neolitica',
-    body:'In Mesopotamia, Cina e Mesoamerica l\'umanità abbandona la caccia per agricoltura e allevamento. La sedentarietà trasforma la società, dando origine ai primi villaggi stabili.' },
-
-  // ── ANTICHITÀ ───────────────────────────────
-  { era:'Antichità', year:'~3500 a.C.', icon:'⚙️', cat:'tech',
-    title:'Invenzione della Ruota',
-    body:'In Mesopotamia viene inventata la ruota. Dapprima usata per la ceramica, poi applicata ai carri, rivoluziona trasporti e meccanica. Uno degli oggetti più influenti della storia.' },
-
-  { era:'Antichità', year:'~3100 a.C.', icon:'📝', cat:'storia',
-    title:'Nascita della Scrittura Cuneiforme',
-    body:'I Sumeri inventano la scrittura. L\'umanità comincia a registrare leggi, commerci e storie: nasce la Storia. Tutto ciò che viene prima è preistoria.' },
-
-  { era:'Antichità', year:'~2560 a.C.', icon:'🔺', cat:'storia',
-    title:'Grande Piramide di Giza',
-    body:'La piramide di Cheope è completata. Alta 146 metri, rimane la struttura più alta del mondo per quasi quattro millenni. Una delle sette meraviglie del mondo antico.' },
-
-  { era:'Antichità', year:'~2000 a.C.', icon:'🏙️', cat:'storia',
-    title:'Civiltà dell\'Indo',
-    body:'Harappa e Mohenjo-daro fioriscono con urbanistica avanzata, fognature, pesi standardizzati. Una delle quattro grandi civiltà antiche, ancora in parte misteriosa.' },
-
-  { era:'Antichità', year:'~1754 a.C.', icon:'⚖️', cat:'politica',
-    title:'Codice di Hammurabi',
-    body:'Il re babilonese Hammurabi promulga 282 leggi scritte. La giustizia diventa codificata e pubblica: primo esempio di stato di diritto della storia.' },
-
-  { era:'Antichità', year:'~1200 a.C.', icon:'🌊', cat:'storia',
-    title:'Collasso dell\'Età del Bronzo',
-    body:'In pochi decenni crollano le civiltà micenea, ittita ed egizia. Un misterioso reset della civiltà le cui cause — invasioni, siccità, terremoti — restano ancora dibattute.' },
-
-  { era:'Antichità', year:'~800–400 a.C.', icon:'🏛️', cat:'arte',
-    title:'Grecia Classica',
-    body:'Ad Atene nascono filosofia, democrazia, teatro e matematica. Socrate, Platone e Aristotele gettano le fondamenta del pensiero occidentale che durano ancora oggi.' },
-
-  { era:'Antichità', year:'~563 a.C.', icon:'☸️', cat:'arte',
-    title:'Nascita del Buddha',
-    body:'Siddhartha Gautama nasce in Nepal. Le sue riflessioni sull\'impermanenza daranno origine al Buddhismo, con oggi oltre 500 milioni di seguaci nel mondo.' },
-
-  { era:'Antichità', year:'~551 a.C.', icon:'☯️', cat:'arte',
-    title:'Confucio',
-    body:'Nasce il filosofo che rivoluziona governo, famiglia ed etica in Cina. Il confucianesimo plasma la cultura est-asiatica per duemila anni e influenza ancora oggi miliardi di persone.' },
-
-  { era:'Antichità', year:'334–323 a.C.', icon:'⚔️', cat:'guerra',
-    title:'Alessandro Magno',
-    body:'In dodici anni conquista un impero che va dalla Grecia all\'India. Diffonde la cultura ellenistica in tutto il mondo conosciuto, fondendo Oriente e Occidente in modo irreversibile.' },
-
-  { era:'Antichità', year:'~221 a.C.', icon:'🐉', cat:'politica',
-    title:'Primo Imperatore di Cina',
-    body:'Qin Shi Huang unifica i regni cinesi. Standardizza scrittura, moneta e pesi. Fa costruire la Grande Muraglia e il leggendario esercito di terracotta. Nasce la Cina.' },
-
-  { era:'Antichità', year:'~4 a.C. – 30 d.C.', icon:'✝️', cat:'storia',
-    title:'Gesù di Nazareth',
-    body:'In Giudea nasce e vive Gesù. Il Cristianesimo che ne seguirà diventa la religione più diffusa al mondo, plasmando storia, arte, diritto e politica per duemila anni.' },
-
-  { era:'Antichità', year:'27 a.C. – 476 d.C.', icon:'🦅', cat:'storia',
-    title:'Impero Romano',
-    body:'Roma governa 70 milioni di persone su tre continenti. Strade, diritto, lingua e acquedotti plasmano l\'Europa per millenni. La sua caduta segna la fine del mondo antico.' },
-
-  // ── MEDIOEVO ────────────────────────────────
-  { era:'Medioevo', year:'476', icon:'🏚️', cat:'storia',
-    title:'Caduta dell\'Impero Romano d\'Occidente',
-    body:'L\'ultimo imperatore Romolo Augustolo viene deposto. Inizia il Medioevo: secoli di trasformazione — non solo declino — che daranno forma all\'Europa moderna.' },
-
-  { era:'Medioevo', year:'622', icon:'📖', cat:'storia',
-    title:'Nascita dell\'Islam',
-    body:'La Hijra di Maometto segna l\'inizio del calendario islamico. In meno di un secolo l\'Islam si diffonde dall\'Arabia alla Spagna e all\'India, trasformando il mondo.' },
-
-  { era:'Medioevo', year:'800', icon:'👑', cat:'politica',
-    title:'Incoronazione di Carlo Magno',
-    body:'Papa Leone III incorona Carlo Magno imperatore. L\'Europa occidentale si riunisce politicamente per la prima volta dopo Roma. Nasce l\'idea di un\'Europa cristiana unita.' },
-
-  { era:'Medioevo', year:'~800–1100', icon:'🕌', cat:'scienza',
-    title:'Età d\'Oro Islamica',
-    body:'Baghdad diventa il centro del sapere mondiale. Al-Khwarizmi inventa l\'algebra, Avicenna scrive il Canone di medicina, Al-Haytham fonda l\'ottica: l\'Islam salva e amplia il sapere antico.' },
-
-  { era:'Medioevo', year:'1066', icon:'⚔️', cat:'guerra',
-    title:'Conquista Normanna dell\'Inghilterra',
-    body:'Guglielmo il Conquistatore vince ad Hastings. La lingua, la legge e la cultura inglese vengono profondamente trasformate. Dall\'incontro tra Vichinghi e Anglosassoni nasce l\'Inghilterra moderna.' },
-
-  { era:'Medioevo', year:'1096–1291', icon:'🏰', cat:'guerra',
-    title:'Le Crociate',
-    body:'Otto spedizioni militari cristiane verso la Terra Santa. Al di là della violenza, favoriscono scambi culturali, commerciali e scientifici tra Europa e mondo islamico.' },
-
-  { era:'Medioevo', year:'1215', icon:'📜', cat:'politica',
-    title:'Magna Carta',
-    body:'Re Giovanni d\'Inghilterra firma la Magna Carta: per la prima volta il potere reale è limitato da un documento scritto. È la radice dei moderni diritti civili e del costituzionalismo.' },
-
-  { era:'Medioevo', year:'1206–1368', icon:'🏹', cat:'guerra',
-    title:'Impero Mongolo',
-    body:'Gengis Khan fonda il più grande impero terrestre della storia: 24 milioni di km². Violento ma anche promotore di commerci e scambi culturali lungo la Via della Seta.' },
-
-  { era:'Medioevo', year:'1347–1351', icon:'💀', cat:'storia',
-    title:'La Peste Nera',
-    body:'La Peste Bubbonica uccide tra 30 e 60 milioni di europei, un terzo della popolazione. La crisi demografica accelera trasformazioni sociali, economiche e religiose che aprono al Rinascimento.' },
-
-  // ── RINASCIMENTO ────────────────────────────
-  { era:'Rinascimento & Scoperte', year:'~1440', icon:'🖨️', cat:'tech',
-    title:'Stampa di Gutenberg',
-    body:'La pressa tipografica di Gutenberg rivoluziona la diffusione del sapere. In pochi decenni il costo dei libri crolla del 99%. La conoscenza diventa accessibile a milioni di persone.' },
-
-  { era:'Rinascimento & Scoperte', year:'1453', icon:'🕌', cat:'storia',
-    title:'Caduta di Costantinopoli',
-    body:'Gli Ottomani conquistano Costantinopoli, ponendo fine all\'Impero Romano d\'Oriente. Intellettuali greci fuggono in Italia con manoscritti antichi, alimentando il Rinascimento.' },
-
-  { era:'Rinascimento & Scoperte', year:'1487', icon:'🗺️', cat:'esplora',
-    title:'Bartolomeu Dias doppia il Capo di Buona Speranza',
-    body:'Il navigatore portoghese è il primo europeo a circumnavigare l\'Africa meridionale, aprendo la rotta marittima verso l\'India e rivoluzionando il commercio globale.' },
-
-  { era:'Rinascimento & Scoperte', year:'1492', icon:'🌎', cat:'esplora',
-    title:'Colombo raggiunge le Americhe',
-    body:'Il 12 ottobre Colombo approda nelle Bahamas. L\'incontro tra Vecchio e Nuovo Mondo trasforma storia, ecologia ed economia globale per sempre.' },
-
-  { era:'Rinascimento & Scoperte', year:'1498', icon:'🚢', cat:'esplora',
-    title:'Vasco da Gama in India',
-    body:'Il portoghese raggiunge Calicut per mare. Si apre la rotta delle spezie, che sposta il baricentro del commercio mondiale e declassa le città della Via della Seta.' },
-
-  { era:'Rinascimento & Scoperte', year:'1503–1519', icon:'🎨', cat:'arte',
-    title:'Leonardo da Vinci',
-    body:'Leonardo dipinge la Gioconda e l\'Ultima Cena, progetta macchine volanti e studia anatomia. Incarna l\'ideale rinascimentale dell\'uomo universale: artista e scienziato insieme.' },
-
-  { era:'Rinascimento & Scoperte', year:'1508–1512', icon:'🖌️', cat:'arte',
-    title:'Michelangelo e la Cappella Sistina',
-    body:'Michelangelo affresca la volta con la Creazione di Adamo. Più tardi aggiungerà il Giudizio Universale. Uno dei vertici assoluti dell\'arte di tutti i tempi.' },
-
-  { era:'Rinascimento & Scoperte', year:'1517', icon:'⛪', cat:'storia',
-    title:'Riforma Protestante',
-    body:'Martin Lutero affigge le 95 Tesi a Wittenberg. La Riforma spezza l\'unità religiosa dell\'Europa e innesca conflitti, ma anche libertà di coscienza e pensiero critico.' },
-
-  { era:'Rinascimento & Scoperte', year:'1519–1522', icon:'🌏', cat:'esplora',
-    title:'Prima Circumnavigazione del Globo',
-    body:'La spedizione Magellano–Elcano completa il primo giro del mondo in nave. La Terra è confermata sferica e la reale vastità degli oceani diventa chiara per la prima volta.' },
-
-  { era:'Rinascimento & Scoperte', year:'1543', icon:'☀️', cat:'scienza',
-    title:'Rivoluzione Copernicana',
-    body:'Copernico pubblica il modello eliocentrico: la Terra orbita attorno al Sole. Dà inizio alla Rivoluzione Scientifica e sconvolge il rapporto tra scienza e religione.' },
-
-  // ── ETÀ MODERNA ─────────────────────────────
-  { era:'Età Moderna', year:'1609', icon:'🔭', cat:'scienza',
-    title:'Galileo e il Telescopio',
-    body:'Galileo punta il telescopio verso il cielo: scopre i satelliti di Giove e le fasi di Venere. Nasce la scienza moderna basata su osservazione, misurazione e matematica.' },
-
-  { era:'Età Moderna', year:'1687', icon:'🍎', cat:'scienza',
-    title:'Newton — Gravitazione Universale',
-    body:'I Principia Mathematica spiegano caduta dei corpi, orbite planetarie e maree con un\'unica legge. La Rivoluzione Scientifica è compiuta: il cosmo è governato da leggi matematiche.' },
-
-  { era:'Età Moderna', year:'1688', icon:'📋', cat:'politica',
-    title:'Glorious Revolution in Inghilterra',
-    body:'Il parlamento depone il re e impone una monarchia costituzionale. Il potere reale è limitato per legge: primo passo concreto verso la democrazia parlamentare moderna.' },
-
-  { era:'Età Moderna', year:'1760–1840', icon:'⚙️', cat:'tech',
-    title:'Rivoluzione Industriale',
-    body:'Vapore, carbone e macchine trasformano l\'economia. Nasce la fabbrica, nasce la classe operaia. L\'Inghilterra diventa la prima potenza industriale del mondo.' },
-
-  { era:'Età Moderna', year:'1776', icon:'🗽', cat:'politica',
-    title:'Dichiarazione d\'Indipendenza USA',
-    body:'Le tredici colonie dichiarano l\'indipendenza dalla Gran Bretagna. Nasce la prima democrazia moderna con principi di uguaglianza, libertà e governo per il popolo.' },
-
-  { era:'Età Moderna', year:'1789', icon:'🗼', cat:'politica',
-    title:'Rivoluzione Francese',
-    body:'Libertà, Uguaglianza, Fraternità. La presa della Bastiglia segna la fine dell\'ancien régime. La sovranità popolare sostituisce la monarchia assoluta, cambiando la politica mondiale.' },
-
-  { era:'Età Moderna', year:'1799–1815', icon:'⚔️', cat:'guerra',
-    title:'Napoleone Bonaparte',
-    body:'Da generale rivoluzionario a imperatore d\'Europa, Napoleone ridisegna la mappa del continente, esporta il codice civile moderno e cambia per sempre le regole della guerra.' },
-
-  { era:'Età Moderna', year:'1859', icon:'🐢', cat:'scienza',
-    title:'Evoluzione di Darwin',
-    body:'"L\'origine delle specie" spiega la diversità della vita con la selezione naturale, senza intervento divino. Una delle idee più rivoluzionarie e controverse della storia del pensiero.' },
-
-  { era:'Età Moderna', year:'1865', icon:'⛓️', cat:'politica',
-    title:'Abolizione della Schiavitù negli USA',
-    body:'Il XIII emendamento abolisce la schiavitù. Lincoln viene assassinato giorni dopo la resa del Sud. Inizia una lunga stagione di lotta per l\'uguaglianza razziale.' },
-
-  { era:'Età Moderna', year:'1869', icon:'🚢', cat:'tech',
-    title:'Canale di Suez',
-    body:'Il Canale collega Mediterraneo e Mar Rosso, accorciando di migliaia di km la rotta tra Europa e Asia. Il commercio globale cambia radicalmente: l\'Africa non è più da circumnavigare.' },
-
-  { era:'Età Moderna', year:'1876', icon:'📞', cat:'tech',
-    title:'Telefono di Bell',
-    body:'Bell brevetta il telefono: comunicazione vocale a distanza diventa realtà. In pochi decenni il telefono collegherà il mondo intero, preparando il terreno all\'era delle telecomunicazioni.' },
-
-  { era:'Età Moderna', year:'1879', icon:'💡', cat:'tech',
-    title:'Edison e la Lampadina',
-    body:'Edison perfeziona la lampadina a incandescenza. Insieme alle centrali elettriche che costruirà, illumina il mondo e rivoluziona la vita quotidiana di miliardi di persone.' },
-
-  { era:'Età Moderna', year:'1895', icon:'🎬', cat:'arte',
-    title:'Invenzione del Cinema',
-    body:'I fratelli Lumière proiettano i primi film a pagamento a Parigi. Nasce la settima arte, che diventerà il medium culturale più potente e diffuso del XX secolo.' },
-
-  { era:'Età Moderna', year:'1895', icon:'📡', cat:'scienza',
-    title:'Raggi X di Röntgen',
-    body:'Wilhelm Röntgen scopre i raggi X e ottiene la prima radiografia della mano della moglie. La medicina cambia per sempre: il corpo umano diventa trasparente alla scienza.' },
-
-  { era:'Età Moderna', year:'1903', icon:'✈️', cat:'tech',
-    title:'Primo Volo dei Fratelli Wright',
-    body:'A Kitty Hawk l\'aereo dei Wright percorre 37 metri in 12 secondi. In meno di 70 anni l\'uomo raggiungerà la Luna. Il cielo smette di essere il limite.' },
-
-  // ── ERA CONTEMPORANEA ───────────────────────
-  { era:'Era Contemporanea', year:'1905', icon:'⚛️', cat:'scienza',
-    title:'Anno Mirabile di Einstein',
-    body:'In un solo anno Einstein pubblica cinque articoli rivoluzionari: relatività ristretta, E=mc², effetto fotoelettrico, moto browniano. La fisica non sarà mai più la stessa.' },
-
-  { era:'Era Contemporanea', year:'1914–1918', icon:'🌐', cat:'guerra',
-    title:'Prima Guerra Mondiale',
-    body:'20 milioni di morti, l\'implosione di quattro imperi, l\'uso di gas tossici e trincee. Il conflitto più devastante della storia fino ad allora ridisegna la mappa del mondo.' },
-
-  { era:'Era Contemporanea', year:'1917', icon:'☭', cat:'politica',
-    title:'Rivoluzione Russa',
-    body:'I bolscevichi di Lenin prendono il potere. Nasce l\'URSS: primo stato marxista della storia. L\'esperimento comunista durerà 74 anni e influenzerà profondamente mezzo mondo.' },
-
-  { era:'Era Contemporanea', year:'1918', icon:'🦠', cat:'storia',
-    title:'Pandemia di Spagnola',
-    body:'L\'influenza uccide tra 50 e 100 milioni di persone in tutto il mondo, più della stessa guerra. È la pandemia più letale della storia moderna.' },
-
-  { era:'Era Contemporanea', year:'1928', icon:'🔬', cat:'scienza',
-    title:'Scoperta della Penicillina',
-    body:'Fleming osserva per caso che una muffa uccide i batteri. La penicillina, sviluppata negli anni \'40, salva decine di milioni di vite e dà inizio all\'era degli antibiotici.' },
-
-  { era:'Era Contemporanea', year:'1929', icon:'📉', cat:'politica',
-    title:'Grande Depressione',
-    body:'Il crollo di Wall Street innesca la peggiore crisi economica della storia. Milioni di disoccupati, ascesa dei fascismi, ridefinizione del ruolo dello stato nell\'economia.' },
-
-  { era:'Era Contemporanea', year:'1939–1945', icon:'💣', cat:'guerra',
-    title:'Seconda Guerra Mondiale',
-    body:'70–85 milioni di morti, la Shoah, le bombe atomiche su Hiroshima e Nagasaki. Il conflitto più distruttivo della storia ridisegna il mondo e porta alla nascita dell\'ONU.' },
-
-  { era:'Era Contemporanea', year:'1945', icon:'☢️', cat:'scienza',
-    title:'Bomba Atomica',
-    body:'Il Progetto Manhattan produce le prime bombe atomiche. Usate su Hiroshima e Nagasaki, causano 200.000 morti. L\'umanità acquisisce per la prima volta la capacità di distruggersi.' },
-
-  { era:'Era Contemporanea', year:'1947', icon:'🏳️', cat:'politica',
-    title:'Indipendenza dell\'India',
-    body:'Gandhi guida l\'India all\'indipendenza dal dominio britannico con la nonviolenza. La decolonizzazione si diffonde in Asia e Africa: decine di nuovi stati nascono nei decenni successivi.' },
-
-  { era:'Era Contemporanea', year:'1948', icon:'📋', cat:'politica',
-    title:'Dichiarazione Universale dei Diritti Umani',
-    body:'L\'ONU adotta la DUDU: 30 articoli che sanciscono diritti inalienabili per ogni essere umano. Un ideale non sempre rispettato, ma che rimane il punto di riferimento morale del mondo.' },
-
-  { era:'Era Contemporanea', year:'1953', icon:'🧬', cat:'scienza',
-    title:'Struttura del DNA',
-    body:'Watson e Crick descrivono la doppia elica del DNA. Nasce la biologia molecolare. Crick esclama: "abbiamo scoperto il segreto della vita." Medicina e biotecnologie cambiano per sempre.' },
-
-  { era:'Era Contemporanea', year:'1957', icon:'🛰️', cat:'spazio',
-    title:'Sputnik — Primo Satellite Artificiale',
-    body:'L\'URSS lancia lo Sputnik 1. Il segnale radio che trasmette mette in allarme l\'Occidente. Inizia la Corsa allo Spazio tra USA e URSS che porterà l\'uomo sulla Luna.' },
-
-  { era:'Era Contemporanea', year:'1961', icon:'👨‍🚀', cat:'spazio',
-    title:'Jurij Gagarin nello Spazio',
-    body:'Il cosmonauta sovietico compie il primo volo umano nello spazio in 108 minuti. "La Terra è blu": un momento che cambia per sempre la percezione dell\'umanità su se stessa.' },
-
-  { era:'Era Contemporanea', year:'1963', icon:'💔', cat:'politica',
-    title:'Assassinio di Kennedy',
-    body:'Il presidente Kennedy viene ucciso a Dallas. La sua morte segna la fine dell\'ottimismo kennedyano e rimane uno dei momenti più traumatici e controversi della storia americana.' },
-
-  { era:'Era Contemporanea', year:'1969', icon:'🚀', cat:'spazio',
-    title:'Sbarco sulla Luna',
-    body:'"Un piccolo passo per un uomo, un grande balzo per l\'umanità." Neil Armstrong cammina sulla Luna. 600 milioni di persone guardano in diretta. Il sogno più audace diventa realtà.' },
-
-  { era:'Era Contemporanea', year:'1989', icon:'🧱', cat:'politica',
-    title:'Caduta del Muro di Berlino',
-    body:'La notte del 9 novembre i berlinesi abbattono il muro che divide la città da 28 anni. Crolla il blocco sovietico, la Germania si riunifica, finisce la Guerra Fredda.' },
-
-  { era:'Era Contemporanea', year:'1990', icon:'🌐', cat:'tech',
-    title:'Nascita del World Wide Web',
-    body:'Tim Berners-Lee propone il WWW al CERN. Il primo sito va online nel 1991. In trent\'anni internet ridefinisce ogni aspetto della civiltà: comunicazione, commercio, cultura, politica.' },
-
-  { era:'Era Contemporanea', year:'2001', icon:'🗽', cat:'storia',
-    title:'11 Settembre 2001',
-    body:'Gli attacchi terroristici di Al-Qaeda uccidono 2.977 persone a New York e Washington. Gli USA dichiarano la "Guerra al Terrore": vent\'anni di conflitti ridisegnano il Medio Oriente.' },
-
-  { era:'Era Contemporanea', year:'2003', icon:'🧬', cat:'scienza',
-    title:'Mappatura del Genoma Umano',
-    body:'Completato il Progetto Genoma Umano: 3 miliardi di basi di DNA sequenziate. Si apre l\'era della medicina personalizzata, della genomica e delle terapie geniche.' },
-
-  { era:'Era Contemporanea', year:'2007', icon:'📱', cat:'tech',
-    title:'Lancio dell\'iPhone',
-    body:'Apple presenta l\'iPhone: computer tascabile, telefono e internet in un oggetto. In quindici anni trasforma comunicazione, fotografia, musica, navigazione, commercio e relazioni sociali.' },
-
-  { era:'Era Contemporanea', year:'2012', icon:'⚛️', cat:'scienza',
-    title:'Scoperta del Bosone di Higgs',
-    body:'Al CERN viene rilevato il bosone di Higgs: la particella che conferisce massa alla materia. La fisica delle particelle completa il Modello Standard dopo decenni di ricerca.' },
-
-  { era:'Era Contemporanea', year:'2015', icon:'☀️', cat:'politica',
-    title:'Accordo di Parigi sul Clima',
-    body:'195 paesi firmano l\'accordo per limitare il riscaldamento globale a 1,5°C. È il primo trattato climatico universale: ambizioso nei numeri, controverso nei meccanismi di attuazione.' },
-
-  { era:'Era Contemporanea', year:'2019–2022', icon:'🦠', cat:'storia',
-    title:'Pandemia di COVID-19',
-    body:'Il virus SARS-CoV-2 causa una pandemia globale con oltre 7 milioni di morti. Vaccini mRNA sviluppati in tempi record, telelavoro di massa, crisi delle catene di fornitura.' },
-
-  { era:'Era Contemporanea', year:'2022–oggi', icon:'🤖', cat:'tech',
-    title:'Rivoluzione dell\'Intelligenza Artificiale',
-    body:'ChatGPT, Gemini, Claude: i grandi modelli linguistici irrompono nella vita quotidiana. Una trasformazione tecnologica paragonabile all\'invenzione di internet, con implicazioni tutte da scrivere.' },
-
-];
-
-// ════════════════════════════════════════════════
-//  MOTORE DI RENDERING — non modificare
-// ════════════════════════════════════════════════
-const TAG_LABELS = {
-  storia:'Storia', scienza:'Scienza', arte:'Arte & Cultura',
-  esplora:'Esplorazioni', guerra:'Guerra', politica:'Politica',
-  tech:'Tecnologia', spazio:'Spazio'
-};
-
-function buildTimeline(filter) {
-  const container = document.getElementById('timeline');
-  const noResults = document.getElementById('no-results');
-  container.innerHTML = '';
-
-  const filtered = filter === 'all' ? EVENTS : EVENTS.filter(e => e.cat === filter);
-
-  if (filtered.length === 0) {
-    noResults.style.display = 'block';
-    document.getElementById('event-count').textContent = '';
-    return;
-  }
-  noResults.style.display = 'none';
-  document.getElementById('event-count').textContent =
-    `${filtered.length} event${filtered.length === 1 ? 'o' : 'i'} ${filter === 'all' ? 'totali' : '· ' + TAG_LABELS[filter]}`;
-
-  let currentEra = null;
-  let sideIndex  = 0;
-
-  filtered.forEach(ev => {
-    if (ev.era !== currentEra) {
-      currentEra = ev.era;
-      sideIndex = 0;
-      const era = document.createElement('div');
-      era.className = 'era-label';
-      era.innerHTML = `<span>${currentEra}</span>`;
-      container.appendChild(era);
-    }
-
-    const side = sideIndex % 2 === 0 ? 'right' : 'left';
-    sideIndex++;
-
-    const el = document.createElement('div');
-    el.className = `event ${side}`;
-
-    const cardHTML = `
-      <span class="card-icon">${ev.icon}</span>
-      <div class="card-year">${ev.year}</div>
-      <div class="card-title">${ev.title}</div>
-      <div class="card-body">${ev.body}</div>
-      <span class="card-tag tag-${ev.cat}">${TAG_LABELS[ev.cat]}</span>
-    `;
-
-    el.innerHTML = side === 'right'
-      ? `<div class="spacer"></div><div class="node"><div class="node-dot"></div></div><div class="card">${cardHTML}</div>`
-      : `<div class="card">${cardHTML}</div><div class="node"><div class="node-dot"></div></div>`;
-
-    container.appendChild(el);
-  });
-
-  // scroll-triggered animations
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
-    });
-  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-
-  container.querySelectorAll('.event').forEach(ev => obs.observe(ev));
+const GITHUB_USER = 'stefanocrugnola';
+const GITHUB_REPO = 'francobolli';
+const GITHUB_FILE = 'stamps.json';
+const ADMIN_PWD   = 'ciaociao';
+const PER_PAGE    = 48;
+
+let allStamps = [], filtered = [], page = 1;
+let adminUnlocked = false, currentModalIdx = -1, editingId = null;
+
+// ── INIT ──────────────────────────────────────────────────────
+async function init() {
+  try {
+    const r = await fetch('stamps.json?_=' + Date.now());
+    allStamps = await r.json();
+  } catch(e) { allStamps = []; }
+  buildSelects(); buildStats(); applyFilters();
 }
 
-// boot
-buildTimeline('all');
+function buildStats() {
+  document.getElementById('s-tot').textContent   = allStamps.length;
+  document.getElementById('s-fds').textContent   = allStamps.filter(s=>s.condizione==='fds'||s.condizione==='spl').length;
+  document.getElementById('s-serie').textContent = [...new Set(allStamps.map(s=>s.serie).filter(Boolean))].length;
+  const a = allStamps.map(s=>s.anno).filter(Boolean);
+  document.getElementById('s-anni').textContent  = a.length ? `${Math.min(...a)}–${Math.max(...a)}` : '—';
+}
 
-// filter buttons
-document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    buildTimeline(btn.dataset.filter);
-    window.scrollTo({ top: document.getElementById('timeline').offsetTop - 80, behavior: 'smooth' });
+function buildSelects() {
+  const series = [...new Set(allStamps.map(s=>s.serie).filter(Boolean))].sort();
+  const anni   = [...new Set(allStamps.map(s=>s.anno).filter(Boolean))].sort((a,b)=>a-b);
+  const ss = document.getElementById('fil-serie'), sa = document.getElementById('fil-anno');
+  ss.innerHTML = '<option value="">Tutte le serie</option>';
+  sa.innerHTML = '<option value="">Tutti gli anni</option>';
+  series.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;ss.appendChild(o);});
+  anni.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a;sa.appendChild(o);});
+}
+
+// ── FILTERS ───────────────────────────────────────────────────
+function applyFilters() {
+  const q=document.getElementById('search').value.toLowerCase().trim();
+  const ser=document.getElementById('fil-serie').value;
+  const ann=document.getElementById('fil-anno').value;
+  const cond=document.getElementById('fil-cond').value;
+  const sort=document.getElementById('fil-sort').value;
+
+  filtered=allStamps.filter(s=>{
+    if(ser&&s.serie!==ser) return false;
+    if(ann&&s.anno!=ann) return false;
+    if(cond&&s.condizione!==cond) return false;
+    if(q&&!`${s.title} ${s.subtitle} ${s.serie} ${s.sassone} ${s.anno} ${s.note}`.toLowerCase().includes(q)) return false;
+    return true;
   });
-});
+
+  if(sort==='anno-asc')  filtered.sort((a,b)=>(a.anno||0)-(b.anno||0));
+  if(sort==='anno-desc') filtered.sort((a,b)=>(b.anno||0)-(a.anno||0));
+  if(sort==='titolo')    filtered.sort((a,b)=>a.title.localeCompare(b.title,'it'));
+  if(sort==='serie')     filtered.sort((a,b)=>(a.serie||'').localeCompare(b.serie||'','it'));
+
+  page=1;
+  document.getElementById('count-badge').textContent = filtered.length===allStamps.length
+    ? `${allStamps.length} esemplari` : `${filtered.length} di ${allStamps.length}`;
+  render();
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function render() {
+  const grid=document.getElementById('grid'), empty=document.getElementById('empty-state');
+  grid.innerHTML='';
+  if(!filtered.length){empty.style.display='block';document.getElementById('pagination').innerHTML='';return;}
+  empty.style.display='none';
+
+  filtered.slice((page-1)*PER_PAGE,page*PER_PAGE).forEach((s,i)=>{
+    const gi=allStamps.indexOf(s);
+    const cL={fds:'FDS',spl:'SPL',bb:'BB'}[s.condizione]||'';
+    const img=s.immagine
+      ?`<img class="stamp-img" src="${s.immagine}" alt="${esc(s.title)}" loading="lazy" onerror="this.outerHTML='<div class=\\'stamp-placeholder\\'><div class=\\'ph-flag\\'>🇮🇹</div><div class=\\'ph-label\\'>Rep. Italiana</div><div class=\\'ph-val\\'>${esc(s.valore||'')}</div></div>'">`
+      :`<div class="stamp-placeholder"><div class="ph-flag">🇮🇹</div><div class="ph-label">Rep. Italiana</div><div class="ph-val">${esc(s.valore||'')}</div></div>`;
+    const c=document.createElement('div');
+    c.className='stamp-card'; c.style.animationDelay=`${Math.min(i*.04,.5)}s`; c.onclick=()=>openModal(gi);
+    c.innerHTML=`<div class="stamp-frame"><div class="perf-l"></div><div class="perf-r"></div>
+      <div class="stamp-inner">${img}<span class="stamp-yr">${s.anno||''}</span></div></div>
+      <div class="stamp-title">${esc(s.title)}</div>
+      <div class="stamp-sub">${esc(s.subtitle||'')}</div>
+      <div class="stamp-tags">
+        ${s.serie?`<span class="tag tag-serie">${esc(s.serie)}</span>`:''}
+        ${cL?`<span class="tag tag-condiz"><span class="cond-dot cond-${s.condizione}"></span>${cL}</span>`:''}
+        ${s.anno?`<span class="tag tag-anno">${s.anno}</span>`:''}
+      </div>`;
+    grid.appendChild(c);
+  });
+  buildPagination();
+}
+
+function buildPagination() {
+  const pg=document.getElementById('pagination'); pg.innerHTML='';
+  const total=Math.ceil(filtered.length/PER_PAGE); if(total<=1) return;
+  const mkBtn=(label,p,disabled,active)=>{
+    const b=document.createElement('button'); b.className='pg-btn'+(active?' active':''); b.textContent=label; b.disabled=disabled;
+    if(!disabled&&p) b.onclick=()=>{page=p;render();window.scrollTo(0,0);}; return b;
+  };
+  pg.appendChild(mkBtn('← Prec',page-1,page===1,false));
+  const range=[];
+  for(let p=1;p<=total;p++){if(p===1||p===total||Math.abs(p-page)<=2)range.push(p);else if(range[range.length-1]!=='…')range.push('…');}
+  range.forEach(p=>{
+    if(p==='…'){const s=document.createElement('span');s.className='pg-info';s.textContent='…';pg.appendChild(s);return;}
+    pg.appendChild(mkBtn(p,p,false,p===page));
+  });
+  pg.appendChild(mkBtn('Succ →',page+1,page===total,false));
+  const info=document.createElement('span');info.className='pg-info';
+  info.textContent=`${(page-1)*PER_PAGE+1}–${Math.min(page*PER_PAGE,filtered.length)} di ${filtered.length}`;
+  pg.appendChild(info);
+}
+
+// ── DETAIL MODAL ──────────────────────────────────────────────
+function openModal(idx) {
+  currentModalIdx=idx; const s=allStamps[idx];
+  document.getElementById('m-title').textContent=s.title;
+  document.getElementById('m-year').textContent=`${s.anno||''} · ${s.valore||''}`;
+  document.getElementById('m-img').innerHTML=s.immagine
+    ?`<img src="${s.immagine}" alt="${esc(s.title)}" onerror="this.outerHTML='<div class=\\'modal-img-ph\\'>🇮🇹</div>'">`
+    :`<div class="modal-img-ph">🇮🇹</div>`;
+  const fields=[['Serie',s.serie],['Sassone',s.sassone],['Dentellatura',s.dentellatura],['Carta',s.carta],['Colore',s.colore],['Valore',s.valore],['Condizione',{fds:'FDS — Fiore di Stampa',spl:'SPL — Splendido',bb:'BB — Bello'}[s.condizione]||s.condizione]];
+  document.getElementById('m-rows').innerHTML=fields.filter(([,v])=>v).map(([l,v])=>
+    `<div class="modal-row"><span class="modal-row-label">${l}</span><span class="modal-row-value">${esc(String(v))}</span></div>`).join('');
+  const ne=document.getElementById('m-note');
+  ne.textContent=s.note||''; ne.style.display=s.note?'block':'none';
+  document.getElementById('m-edit-btn').style.display=adminUnlocked?'block':'none';
+  document.getElementById('modal').classList.add('open');
+}
+
+function editFromModal(){closeModal();openAdmin();switchTabByName('form');setTimeout(()=>loadForm(allStamps[currentModalIdx]),80);}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeAdmin();}});
+
+// ── ADMIN AUTH ────────────────────────────────────────────────
+function openAdminAuth(){if(adminUnlocked){openAdmin();return;}document.getElementById('pwd-overlay').style.display='flex';setTimeout(()=>document.getElementById('pwd-input').focus(),80);}
+function checkPwd(){
+  if(document.getElementById('pwd-input').value===ADMIN_PWD){
+    adminUnlocked=true; document.getElementById('pwd-overlay').style.display='none';
+    document.getElementById('pwd-input').value=''; openAdmin();
+  } else {
+    const e=document.getElementById('pwd-error'); e.style.display='block'; setTimeout(()=>e.style.display='none',2500);
+  }
+}
+function openAdmin(){document.getElementById('admin-panel').classList.add('open');switchTabByName('list');}
+function closeAdmin(){document.getElementById('admin-panel').classList.remove('open');}
+
+// ── ADMIN TABS ────────────────────────────────────────────────
+function switchTab(tab,btn){
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const body=document.getElementById('admin-body');
+  if(tab==='list')     renderList(body);
+  if(tab==='form')     renderForm(body);
+  if(tab==='settings') renderSettings(body);
+}
+function switchTabByName(tab){
+  const tabs=document.querySelectorAll('.admin-tab');
+  const idx={'list':0,'form':1,'settings':2}[tab];
+  tabs.forEach(t=>t.classList.remove('active'));
+  if(tabs[idx]) tabs[idx].classList.add('active');
+  const body=document.getElementById('admin-body');
+  if(tab==='list')     renderList(body);
+  if(tab==='form')     renderForm(body);
+  if(tab==='settings') renderSettings(body);
+}
+
+// ── LIST TAB ──────────────────────────────────────────────────
+function renderList(body){
+  body.innerHTML=`<input class="admin-search" id="adm-q" placeholder="🔍 Cerca…" oninput="filterList()">
+  <div class="adm-count" id="adm-count"></div><div id="adm-list"></div>`;
+  renderListItems(allStamps);
+}
+function filterList(){
+  const q=document.getElementById('adm-q').value.toLowerCase();
+  renderListItems(allStamps.filter(s=>`${s.title} ${s.serie} ${s.anno} ${s.sassone}`.toLowerCase().includes(q)));
+}
+function renderListItems(stamps){
+  const el=document.getElementById('adm-list'); if(!el) return;
+  document.getElementById('adm-count').textContent=`${stamps.length} francobolli`;
+  el.innerHTML=stamps.map(s=>`<div class="admin-list-item">
+    <div class="ali-info"><div class="ali-title">${esc(s.title)}</div><div class="ali-meta">${s.anno||''} · ${s.serie||''}</div></div>
+    <button class="ali-btn" onclick="editStampById(${s.id})">✏️</button>
+    <button class="ali-btn del" onclick="deleteStampById(${s.id})">🗑️</button>
+  </div>`).join('');
+}
+
+// ── FORM TAB ──────────────────────────────────────────────────
+function renderForm(body,stamp=null){
+  editingId=stamp?stamp.id:null; const s=stamp||{};
+  body.innerHTML=`<button class="new-btn" onclick="renderForm(document.getElementById('admin-body'))">+ Nuovo francobollo</button>
+  ${editingId?`<p style="font-size:.8rem;color:var(--gold);margin-bottom:.8rem;font-style:italic;">Modifica: ${esc(s.title||'')}</p>`:''}
+  <div class="form-group"><label>Titolo *</label><input id="f-title" value="${esc(s.title||'')}"></div>
+  <div class="form-group"><label>Sottotitolo</label><input id="f-subtitle" value="${esc(s.subtitle||'')}"></div>
+  <div class="form-row">
+    <div class="form-group"><label>Anno</label><input id="f-anno" type="number" min="1800" max="2099" value="${s.anno||''}"></div>
+    <div class="form-group"><label>Valore</label><input id="f-valore" value="${esc(s.valore||'')}"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Serie</label><input id="f-serie" value="${esc(s.serie||'')}"></div>
+    <div class="form-group"><label>Sassone</label><input id="f-sassone" value="${esc(s.sassone||'')}"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Dentellatura</label><input id="f-dent" value="${esc(s.dentellatura||'')}"></div>
+    <div class="form-group"><label>Carta</label><input id="f-carta" value="${esc(s.carta||'')}"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Colore</label><input id="f-colore" value="${esc(s.colore||'')}"></div>
+    <div class="form-group"><label>Condizione</label>
+      <select id="f-cond">
+        <option value="fds"${s.condizione==='fds'?' selected':''}>FDS — Fiore di Stampa</option>
+        <option value="spl"${s.condizione==='spl'?' selected':''}>SPL — Splendido</option>
+        <option value="bb"${s.condizione==='bb'?' selected':''}>BB — Bello</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group"><label>URL immagine</label><input id="f-img" value="${esc(s.immagine||'')}" placeholder="https://esempio.com/immagine.jpg"></div>
+  <div class="form-group"><label>Note personali</label><textarea id="f-note">${esc(s.note||'')}</textarea></div>
+  <div class="form-actions">
+    <button class="btn-save" onclick="saveStamp()">${editingId?'💾 Salva modifiche':'➕ Aggiungi francobollo'}</button>
+    <button class="btn-cancel" onclick="renderForm(document.getElementById('admin-body'))">Annulla</button>
+  </div>
+  <div class="adm-status" id="adm-status"></div>`;
+}
+
+function loadForm(s){renderForm(document.getElementById('admin-body'),s);}
+function editStampById(id){switchTabByName('form');setTimeout(()=>loadForm(allStamps.find(s=>s.id===id)),50);}
+
+function gv(id){return document.getElementById(id)?.value?.trim()||'';}
+
+async function saveStamp(){
+  const title=gv('f-title'); if(!title){showStatus('err','Il titolo è obbligatorio.');return;}
+  const token=localStorage.getItem('gh_token'); if(!token){showStatus('err','Inserisci il token GitHub nelle Impostazioni.');return;}
+
+  const stamp={
+    id: editingId||(Math.max(0,...allStamps.map(s=>s.id||0))+1),
+    title, subtitle:gv('f-subtitle'),
+    anno:parseInt(gv('f-anno'))||null, valore:gv('f-valore'),
+    serie:gv('f-serie'), sassone:gv('f-sassone'),
+    dentellatura:gv('f-dent'), carta:gv('f-carta'), colore:gv('f-colore'),
+    categoria:'repubblica', condizione:document.getElementById('f-cond').value,
+    immagine:gv('f-img')||null, note:gv('f-note')
+  };
+
+  if(editingId){const i=allStamps.findIndex(s=>s.id===editingId);if(i>=0)allStamps[i]=stamp;}
+  else allStamps.push(stamp);
+
+  showStatus('loading',editingId?'Salvataggio in corso…':'Aggiunta in corso…');
+  if(await pushToGitHub(token)){
+    buildStats();buildSelects();applyFilters();
+    showStatus('ok',editingId?'✅ Modifiche salvate su GitHub!':'✅ Francobollo aggiunto su GitHub!');
+    editingId=null;
+    setTimeout(()=>renderForm(document.getElementById('admin-body')),2000);
+  }
+}
+
+async function deleteStampById(id){
+  const s=allStamps.find(x=>x.id===id);
+  if(!s||!confirm(`Eliminare "${s.title}"?`)) return;
+  const token=localStorage.getItem('gh_token');
+  if(!token){alert('Inserisci il token GitHub nelle Impostazioni.');return;}
+  allStamps=allStamps.filter(x=>x.id!==id);
+  if(await pushToGitHub(token)){buildStats();buildSelects();applyFilters();filterList();}
+  else{allStamps.push(s);alert('❌ Errore connessione GitHub. Riprova.');}
+}
+
+// ── GITHUB API ────────────────────────────────────────────────
+async function pushToGitHub(token){
+  try{
+    const g=await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`,
+      {headers:{'Authorization':`Bearer ${token}`,'Accept':'application/vnd.github+json'}});
+    if(!g.ok){showStatus('err','❌ Token non valido o repository non trovato.');return false;}
+    const {sha}=await g.json();
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(allStamps,null,2))));
+    const p=await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`,{
+      method:'PUT',
+      headers:{'Authorization':`Bearer ${token}`,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
+      body:JSON.stringify({message:`Collezione aggiornata — ${new Date().toLocaleDateString('it-IT')}`,content,sha})
+    });
+    if(!p.ok){showStatus('err','❌ Errore salvataggio. Verifica i permessi del token.');return false;}
+    return true;
+  }catch(e){showStatus('err','❌ Errore di rete.');return false;}
+}
+
+function showStatus(type,msg){
+  const el=document.getElementById('adm-status'); if(!el) return;
+  el.className='adm-status '+type; el.textContent=msg;
+}
+
+// ── SETTINGS TAB ──────────────────────────────────────────────
+function renderSettings(body){
+  const saved=localStorage.getItem('gh_token')||'';
+  body.innerHTML=`<div class="token-box">
+    <label>🔑 GitHub Personal Access Token</label>
+    <input type="password" id="s-token" value="${saved}" placeholder="ghp_xxxxxxxxxxxxxxxx">
+    <p class="token-hint">
+      Necessario per salvare le modifiche direttamente su GitHub.<br><br>
+      Come generarlo:<br>
+      1. Vai su <strong>github.com → Settings</strong><br>
+      2. <strong>Developer settings → Personal access tokens → Fine-grained tokens</strong><br>
+      3. Clicca <strong>Generate new token</strong><br>
+      4. Seleziona repository: <em>francobolli</em><br>
+      5. Permessi: <em>Contents → Read and write</em><br>
+      6. Copia il token e incollalo qui
+    </p>
+  </div>
+  <button class="btn-save" style="width:100%" onclick="saveToken()">💾 Salva token</button>
+  <div class="adm-status" id="adm-status"></div>
+  <hr class="settings-sep">
+  <button class="logout-btn" onclick="logoutAdmin()">🚪 Esci dal pannello admin</button>`;
+}
+
+function saveToken(){
+  const t=document.getElementById('s-token').value.trim();
+  if(!t){showStatus('err','Inserisci un token valido.');return;}
+  localStorage.setItem('gh_token',t); showStatus('ok','✅ Token salvato nel browser.');
+}
+function logoutAdmin(){adminUnlocked=false;closeAdmin();}
+
+function esc(str){return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+init();
 </script>
 </body>
 </html>
