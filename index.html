@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cronologia della Storia</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dim: rgba(201,168,76,0.18);
+    --bg: #0b0b0f;
+    --surface: #13131a;
+    --text: #e8e2d5;
+    --text-dim: #7a7468;
+    --line: rgba(201,168,76,0.25);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    overflow-x: hidden;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    padding: 2rem;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(201,168,76,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 80% 80%, rgba(80,60,140,0.08) 0%, transparent 60%);
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(201,168,76,0.04) 60px),
+      repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(201,168,76,0.04) 60px);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: .72rem;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.6rem;
+    opacity: 0;
+    animation: fadeUp .8s .2s forwards;
+  }
+  .hero-title {
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 300;
+    line-height: 1;
+    color: var(--text);
+    opacity: 0;
+    animation: fadeUp .9s .4s forwards;
+  }
+  .hero-title em { font-style: italic; color: var(--gold-light); }
+  .hero-sub {
+    margin-top: 1.8rem;
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: var(--text-dim);
+    max-width: 480px;
+    line-height: 1.6;
+    opacity: 0;
+    animation: fadeUp .9s .6s forwards;
+  }
+  .scroll-cue {
+    position: absolute;
+    bottom: 2.4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .5rem;
+    opacity: 0;
+    animation: fadeIn 1s 1.2s forwards;
+  }
+  .scroll-cue span {
+    font-family: 'DM Mono', monospace;
+    font-size: .65rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .scroll-line {
+    width: 1px; height: 50px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  /* ─── FILTER BAR ─── */
+  .filter-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(11,11,15,0.92);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--line);
+    padding: .9rem 2rem;
+    display: flex;
+    justify-content: center;
+    gap: .6rem;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: .68rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    padding: .45rem 1.1rem;
+    border: 1px solid rgba(201,168,76,0.3);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all .25s;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--gold-dim);
+    border-color: var(--gold);
+    color: var(--gold-light);
+  }
+
+  #event-count {
+    font-family: 'DM Mono', monospace;
+    font-size: .65rem;
+    letter-spacing: .12em;
+    color: var(--text-dim);
+    text-align: center;
+    padding: .7rem;
+  }
+
+  /* ─── TIMELINE ─── */
+  .timeline-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1rem 2rem 10rem;
+    position: relative;
+  }
+  .timeline-section::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    background: linear-gradient(to bottom, transparent 0%, var(--gold) 2%, var(--gold) 98%, transparent 100%);
+    opacity: .28;
+  }
+
+  .era-label {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    margin: 4rem 0 2.5rem;
+  }
+  .era-label:first-child { margin-top: 2rem; }
+  .era-label span {
+    font-family: 'DM Mono', monospace;
+    font-size: .7rem;
+    letter-spacing: .35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: var(--bg);
+    padding: .4rem 1.4rem;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+  }
+
+  .event {
+    display: grid;
+    grid-template-columns: 1fr 56px 1fr;
+    align-items: start;
+    margin-bottom: 2.8rem;
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity .5s ease, transform .5s ease;
+  }
+  .event.visible { opacity: 1; transform: translateY(0); }
+
+  .event.right .card { grid-column: 3; }
+  .event.right .spacer { grid-column: 1; }
+  .event.left  .card { grid-column: 1; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid rgba(201,168,76,0.12);
+    border-radius: 4px;
+    padding: 1.4rem 1.6rem;
+    position: relative;
+    transition: border-color .3s, box-shadow .3s;
+  }
+  .card:hover {
+    border-color: rgba(201,168,76,0.4);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .card::after {
+    content: '';
+    position: absolute;
+    top: 1.8rem;
+    width: 28px;
+    height: 1px;
+    background: var(--line);
+  }
+  .event.right .card::after { left: -29px; }
+  .event.left  .card::after { right: -29px; }
+
+  .node {
+    grid-column: 2;
+    display: flex;
+    justify-content: center;
+    padding-top: 1.6rem;
+  }
+  .node-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 0 4px rgba(201,168,76,0.1);
+    flex-shrink: 0;
+    transition: transform .3s, box-shadow .3s;
+  }
+  .event:hover .node-dot {
+    transform: scale(1.5);
+    box-shadow: 0 0 0 8px rgba(201,168,76,0.08), 0 0 18px rgba(201,168,76,0.3);
+  }
+
+  .card-year {
+    font-family: 'DM Mono', monospace;
+    font-size: .67rem;
+    letter-spacing: .2em;
+    color: var(--gold);
+    margin-bottom: .4rem;
+  }
+  .card-icon { font-size: 1.5rem; margin-bottom: .45rem; display: block; }
+  .card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--text);
+    margin-bottom: .5rem;
+  }
+  .card-body {
+    font-size: .95rem;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--text-dim);
+  }
+  .card-tag {
+    display: inline-block;
+    margin-top: .75rem;
+    font-family: 'DM Mono', monospace;
+    font-size: .6rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    padding: .2rem .6rem;
+    border-radius: 2px;
+    border: 1px solid;
+  }
+
+  .tag-scienza  { color: #7ec8e3; border-color: rgba(126,200,227,.3); background: rgba(126,200,227,.06); }
+  .tag-storia   { color: #e38a7e; border-color: rgba(227,138,126,.3); background: rgba(227,138,126,.06); }
+  .tag-arte     { color: #a07ee3; border-color: rgba(160,126,227,.3); background: rgba(160,126,227,.06); }
+  .tag-esplora  { color: #7ee3a0; border-color: rgba(126,227,160,.3); background: rgba(126,227,160,.06); }
+  .tag-guerra   { color: #e3c07e; border-color: rgba(227,192,126,.3); background: rgba(227,192,126,.06); }
+  .tag-politica { color: #e3a07e; border-color: rgba(227,160,126,.3); background: rgba(227,160,126,.06); }
+  .tag-tech     { color: #7ecce3; border-color: rgba(126,204,227,.3); background: rgba(126,204,227,.06); }
+  .tag-spazio   { color: #c07ee3; border-color: rgba(192,126,227,.3); background: rgba(192,126,227,.06); }
+
+  #no-results {
+    text-align: center;
+    padding: 4rem 2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: .75rem;
+    letter-spacing: .15em;
+    color: var(--text-dim);
+    display: none;
+  }
+
+  footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    border-top: 1px solid var(--line);
+    font-family: 'DM Mono', monospace;
+    font-size: .68rem;
+    letter-spacing: .15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  @keyframes fadeUp  { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+  @keyframes scrollPulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+  @media (max-width: 700px) {
+    .timeline-section::before { left: 24px; }
+    .event { grid-template-columns: 48px 1fr; }
+    .event .node { grid-column: 1; grid-row: 1; }
+    .event.right .card,
+    .event.left  .card { grid-column: 2; grid-row: 1; }
+    .event.right .spacer { display: none; }
+    .event.right .card::after,
+    .event.left  .card::after { left: -24px; right: auto; width: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <p class="hero-eyebrow">Dalla Preistoria al presente</p>
+  <h1 class="hero-title">La <em>Storia</em><br>dell'Umanità</h1>
+  <p class="hero-sub">Un viaggio attraverso gli eventi che hanno plasmato il mondo in cui viviamo.</p>
+  <div class="scroll-cue">
+    <span>Scorri</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<div class="filter-bar">
+  <button class="filter-btn active" data-filter="all">Tutti</button>
+  <button class="filter-btn" data-filter="storia">Storia</button>
+  <button class="filter-btn" data-filter="scienza">Scienza</button>
+  <button class="filter-btn" data-filter="arte">Arte &amp; Cultura</button>
+  <button class="filter-btn" data-filter="esplora">Esplorazioni</button>
+  <button class="filter-btn" data-filter="guerra">Guerra</button>
+  <button class="filter-btn" data-filter="politica">Politica</button>
+  <button class="filter-btn" data-filter="tech">Tecnologia</button>
+  <button class="filter-btn" data-filter="spazio">Spazio</button>
+</div>
+
+<div id="event-count"></div>
+<section class="timeline-section" id="timeline"></section>
+<div id="no-results">Nessun evento trovato per questa categoria.</div>
+
+<footer><p>Cronologia della Storia Universale &nbsp;·&nbsp; Scorri, filtra, esplora</p></footer>
+
+<script>
+// ════════════════════════════════════════════════════════════
+//  📌 DATI EVENTI — aggiungi qui nuovi eventi con una riga!
+//
+//  Campi obbligatori:
+//    era    → nome del gruppo/era (stringa libera)
+//    year   → anno o periodo (stringa)
+//    icon   → emoji rappresentativa
+//    cat    → categoria: storia | scienza | arte | esplora |
+//              guerra | politica | tech | spazio
+//    title  → titolo breve
+//    body   → descrizione (2-4 righe)
+// ════════════════════════════════════════════════════════════
+const EVENTS = [
+
+  // ── PREISTORIA ──────────────────────────────
+  { era:'Preistoria', year:'~3,3 milioni di anni fa', icon:'🪨', cat:'storia',
+    title:'Primi Utensili in Pietra',
+    body:'In Africa orientale compaiono i primi strumenti litici della cultura Oldowaiana. Gli ominidi iniziano a trasformare la natura con la tecnica, ponendo le basi dell\'intelligenza umana.' },
+
+  { era:'Preistoria', year:'~200.000 a.C.', icon:'🦴', cat:'storia',
+    title:'Homo Sapiens in Africa',
+    body:'L\'Homo Sapiens emerge in Africa. Anatomicamente moderno, dotato di linguaggio simbolico e capacità di pianificazione a lungo termine: è l\'inizio della nostra specie.' },
+
+  { era:'Preistoria', year:'~70.000 a.C.', icon:'🧠', cat:'storia',
+    title:'La Grande Migrazione',
+    body:'Dall\'Africa, l\'Homo Sapiens si diffonde in Asia, Europa e Oceania. In poche decine di millenni colonizza l\'intero pianeta, adattandosi a climi e ambienti radicalmente diversi.' },
+
+  { era:'Preistoria', year:'~40.000 a.C.', icon:'🎨', cat:'arte',
+    title:'Arte Rupestre',
+    body:'Le grotte di Altamira, Lascaux e Chauvet si riempiono di pitture straordinarie: bisonti, cervi, mani in negativo. Il pensiero simbolico umano esplode in tutta la sua potenza.' },
+
+  { era:'Preistoria', year:'~10.000 a.C.', icon:'🌾', cat:'storia',
+    title:'Rivoluzione Neolitica',
+    body:'In Mesopotamia, Cina e Mesoamerica l\'umanità abbandona la caccia per agricoltura e allevamento. La sedentarietà trasforma la società, dando origine ai primi villaggi stabili.' },
+
+  // ── ANTICHITÀ ───────────────────────────────
+  { era:'Antichità', year:'~3500 a.C.', icon:'⚙️', cat:'tech',
+    title:'Invenzione della Ruota',
+    body:'In Mesopotamia viene inventata la ruota. Dapprima usata per la ceramica, poi applicata ai carri, rivoluziona trasporti e meccanica. Uno degli oggetti più influenti della storia.' },
+
+  { era:'Antichità', year:'~3100 a.C.', icon:'📝', cat:'storia',
+    title:'Nascita della Scrittura Cuneiforme',
+    body:'I Sumeri inventano la scrittura. L\'umanità comincia a registrare leggi, commerci e storie: nasce la Storia. Tutto ciò che viene prima è preistoria.' },
+
+  { era:'Antichità', year:'~2560 a.C.', icon:'🔺', cat:'storia',
+    title:'Grande Piramide di Giza',
+    body:'La piramide di Cheope è completata. Alta 146 metri, rimane la struttura più alta del mondo per quasi quattro millenni. Una delle sette meraviglie del mondo antico.' },
+
+  { era:'Antichità', year:'~2000 a.C.', icon:'🏙️', cat:'storia',
+    title:'Civiltà dell\'Indo',
+    body:'Harappa e Mohenjo-daro fioriscono con urbanistica avanzata, fognature, pesi standardizzati. Una delle quattro grandi civiltà antiche, ancora in parte misteriosa.' },
+
+  { era:'Antichità', year:'~1754 a.C.', icon:'⚖️', cat:'politica',
+    title:'Codice di Hammurabi',
+    body:'Il re babilonese Hammurabi promulga 282 leggi scritte. La giustizia diventa codificata e pubblica: primo esempio di stato di diritto della storia.' },
+
+  { era:'Antichità', year:'~1200 a.C.', icon:'🌊', cat:'storia',
+    title:'Collasso dell\'Età del Bronzo',
+    body:'In pochi decenni crollano le civiltà micenea, ittita ed egizia. Un misterioso reset della civiltà le cui cause — invasioni, siccità, terremoti — restano ancora dibattute.' },
+
+  { era:'Antichità', year:'~800–400 a.C.', icon:'🏛️', cat:'arte',
+    title:'Grecia Classica',
+    body:'Ad Atene nascono filosofia, democrazia, teatro e matematica. Socrate, Platone e Aristotele gettano le fondamenta del pensiero occidentale che durano ancora oggi.' },
+
+  { era:'Antichità', year:'~563 a.C.', icon:'☸️', cat:'arte',
+    title:'Nascita del Buddha',
+    body:'Siddhartha Gautama nasce in Nepal. Le sue riflessioni sull\'impermanenza daranno origine al Buddhismo, con oggi oltre 500 milioni di seguaci nel mondo.' },
+
+  { era:'Antichità', year:'~551 a.C.', icon:'☯️', cat:'arte',
+    title:'Confucio',
+    body:'Nasce il filosofo che rivoluziona governo, famiglia ed etica in Cina. Il confucianesimo plasma la cultura est-asiatica per duemila anni e influenza ancora oggi miliardi di persone.' },
+
+  { era:'Antichità', year:'334–323 a.C.', icon:'⚔️', cat:'guerra',
+    title:'Alessandro Magno',
+    body:'In dodici anni conquista un impero che va dalla Grecia all\'India. Diffonde la cultura ellenistica in tutto il mondo conosciuto, fondendo Oriente e Occidente in modo irreversibile.' },
+
+  { era:'Antichità', year:'~221 a.C.', icon:'🐉', cat:'politica',
+    title:'Primo Imperatore di Cina',
+    body:'Qin Shi Huang unifica i regni cinesi. Standardizza scrittura, moneta e pesi. Fa costruire la Grande Muraglia e il leggendario esercito di terracotta. Nasce la Cina.' },
+
+  { era:'Antichità', year:'~4 a.C. – 30 d.C.', icon:'✝️', cat:'storia',
+    title:'Gesù di Nazareth',
+    body:'In Giudea nasce e vive Gesù. Il Cristianesimo che ne seguirà diventa la religione più diffusa al mondo, plasmando storia, arte, diritto e politica per duemila anni.' },
+
+  { era:'Antichità', year:'27 a.C. – 476 d.C.', icon:'🦅', cat:'storia',
+    title:'Impero Romano',
+    body:'Roma governa 70 milioni di persone su tre continenti. Strade, diritto, lingua e acquedotti plasmano l\'Europa per millenni. La sua caduta segna la fine del mondo antico.' },
+
+  // ── MEDIOEVO ────────────────────────────────
+  { era:'Medioevo', year:'476', icon:'🏚️', cat:'storia',
+    title:'Caduta dell\'Impero Romano d\'Occidente',
+    body:'L\'ultimo imperatore Romolo Augustolo viene deposto. Inizia il Medioevo: secoli di trasformazione — non solo declino — che daranno forma all\'Europa moderna.' },
+
+  { era:'Medioevo', year:'622', icon:'📖', cat:'storia',
+    title:'Nascita dell\'Islam',
+    body:'La Hijra di Maometto segna l\'inizio del calendario islamico. In meno di un secolo l\'Islam si diffonde dall\'Arabia alla Spagna e all\'India, trasformando il mondo.' },
+
+  { era:'Medioevo', year:'800', icon:'👑', cat:'politica',
+    title:'Incoronazione di Carlo Magno',
+    body:'Papa Leone III incorona Carlo Magno imperatore. L\'Europa occidentale si riunisce politicamente per la prima volta dopo Roma. Nasce l\'idea di un\'Europa cristiana unita.' },
+
+  { era:'Medioevo', year:'~800–1100', icon:'🕌', cat:'scienza',
+    title:'Età d\'Oro Islamica',
+    body:'Baghdad diventa il centro del sapere mondiale. Al-Khwarizmi inventa l\'algebra, Avicenna scrive il Canone di medicina, Al-Haytham fonda l\'ottica: l\'Islam salva e amplia il sapere antico.' },
+
+  { era:'Medioevo', year:'1066', icon:'⚔️', cat:'guerra',
+    title:'Conquista Normanna dell\'Inghilterra',
+    body:'Guglielmo il Conquistatore vince ad Hastings. La lingua, la legge e la cultura inglese vengono profondamente trasformate. Dall\'incontro tra Vichinghi e Anglosassoni nasce l\'Inghilterra moderna.' },
+
+  { era:'Medioevo', year:'1096–1291', icon:'🏰', cat:'guerra',
+    title:'Le Crociate',
+    body:'Otto spedizioni militari cristiane verso la Terra Santa. Al di là della violenza, favoriscono scambi culturali, commerciali e scientifici tra Europa e mondo islamico.' },
+
+  { era:'Medioevo', year:'1215', icon:'📜', cat:'politica',
+    title:'Magna Carta',
+    body:'Re Giovanni d\'Inghilterra firma la Magna Carta: per la prima volta il potere reale è limitato da un documento scritto. È la radice dei moderni diritti civili e del costituzionalismo.' },
+
+  { era:'Medioevo', year:'1206–1368', icon:'🏹', cat:'guerra',
+    title:'Impero Mongolo',
+    body:'Gengis Khan fonda il più grande impero terrestre della storia: 24 milioni di km². Violento ma anche promotore di commerci e scambi culturali lungo la Via della Seta.' },
+
+  { era:'Medioevo', year:'1347–1351', icon:'💀', cat:'storia',
+    title:'La Peste Nera',
+    body:'La Peste Bubbonica uccide tra 30 e 60 milioni di europei, un terzo della popolazione. La crisi demografica accelera trasformazioni sociali, economiche e religiose che aprono al Rinascimento.' },
+
+  // ── RINASCIMENTO ────────────────────────────
+  { era:'Rinascimento & Scoperte', year:'~1440', icon:'🖨️', cat:'tech',
+    title:'Stampa di Gutenberg',
+    body:'La pressa tipografica di Gutenberg rivoluziona la diffusione del sapere. In pochi decenni il costo dei libri crolla del 99%. La conoscenza diventa accessibile a milioni di persone.' },
+
+  { era:'Rinascimento & Scoperte', year:'1453', icon:'🕌', cat:'storia',
+    title:'Caduta di Costantinopoli',
+    body:'Gli Ottomani conquistano Costantinopoli, ponendo fine all\'Impero Romano d\'Oriente. Intellettuali greci fuggono in Italia con manoscritti antichi, alimentando il Rinascimento.' },
+
+  { era:'Rinascimento & Scoperte', year:'1487', icon:'🗺️', cat:'esplora',
+    title:'Bartolomeu Dias doppia il Capo di Buona Speranza',
+    body:'Il navigatore portoghese è il primo europeo a circumnavigare l\'Africa meridionale, aprendo la rotta marittima verso l\'India e rivoluzionando il commercio globale.' },
+
+  { era:'Rinascimento & Scoperte', year:'1492', icon:'🌎', cat:'esplora',
+    title:'Colombo raggiunge le Americhe',
+    body:'Il 12 ottobre Colombo approda nelle Bahamas. L\'incontro tra Vecchio e Nuovo Mondo trasforma storia, ecologia ed economia globale per sempre.' },
+
+  { era:'Rinascimento & Scoperte', year:'1498', icon:'🚢', cat:'esplora',
+    title:'Vasco da Gama in India',
+    body:'Il portoghese raggiunge Calicut per mare. Si apre la rotta delle spezie, che sposta il baricentro del commercio mondiale e declassa le città della Via della Seta.' },
+
+  { era:'Rinascimento & Scoperte', year:'1503–1519', icon:'🎨', cat:'arte',
+    title:'Leonardo da Vinci',
+    body:'Leonardo dipinge la Gioconda e l\'Ultima Cena, progetta macchine volanti e studia anatomia. Incarna l\'ideale rinascimentale dell\'uomo universale: artista e scienziato insieme.' },
+
+  { era:'Rinascimento & Scoperte', year:'1508–1512', icon:'🖌️', cat:'arte',
+    title:'Michelangelo e la Cappella Sistina',
+    body:'Michelangelo affresca la volta con la Creazione di Adamo. Più tardi aggiungerà il Giudizio Universale. Uno dei vertici assoluti dell\'arte di tutti i tempi.' },
+
+  { era:'Rinascimento & Scoperte', year:'1517', icon:'⛪', cat:'storia',
+    title:'Riforma Protestante',
+    body:'Martin Lutero affigge le 95 Tesi a Wittenberg. La Riforma spezza l\'unità religiosa dell\'Europa e innesca conflitti, ma anche libertà di coscienza e pensiero critico.' },
+
+  { era:'Rinascimento & Scoperte', year:'1519–1522', icon:'🌏', cat:'esplora',
+    title:'Prima Circumnavigazione del Globo',
+    body:'La spedizione Magellano–Elcano completa il primo giro del mondo in nave. La Terra è confermata sferica e la reale vastità degli oceani diventa chiara per la prima volta.' },
+
+  { era:'Rinascimento & Scoperte', year:'1543', icon:'☀️', cat:'scienza',
+    title:'Rivoluzione Copernicana',
+    body:'Copernico pubblica il modello eliocentrico: la Terra orbita attorno al Sole. Dà inizio alla Rivoluzione Scientifica e sconvolge il rapporto tra scienza e religione.' },
+
+  // ── ETÀ MODERNA ─────────────────────────────
+  { era:'Età Moderna', year:'1609', icon:'🔭', cat:'scienza',
+    title:'Galileo e il Telescopio',
+    body:'Galileo punta il telescopio verso il cielo: scopre i satelliti di Giove e le fasi di Venere. Nasce la scienza moderna basata su osservazione, misurazione e matematica.' },
+
+  { era:'Età Moderna', year:'1687', icon:'🍎', cat:'scienza',
+    title:'Newton — Gravitazione Universale',
+    body:'I Principia Mathematica spiegano caduta dei corpi, orbite planetarie e maree con un\'unica legge. La Rivoluzione Scientifica è compiuta: il cosmo è governato da leggi matematiche.' },
+
+  { era:'Età Moderna', year:'1688', icon:'📋', cat:'politica',
+    title:'Glorious Revolution in Inghilterra',
+    body:'Il parlamento depone il re e impone una monarchia costituzionale. Il potere reale è limitato per legge: primo passo concreto verso la democrazia parlamentare moderna.' },
+
+  { era:'Età Moderna', year:'1760–1840', icon:'⚙️', cat:'tech',
+    title:'Rivoluzione Industriale',
+    body:'Vapore, carbone e macchine trasformano l\'economia. Nasce la fabbrica, nasce la classe operaia. L\'Inghilterra diventa la prima potenza industriale del mondo.' },
+
+  { era:'Età Moderna', year:'1776', icon:'🗽', cat:'politica',
+    title:'Dichiarazione d\'Indipendenza USA',
+    body:'Le tredici colonie dichiarano l\'indipendenza dalla Gran Bretagna. Nasce la prima democrazia moderna con principi di uguaglianza, libertà e governo per il popolo.' },
+
+  { era:'Età Moderna', year:'1789', icon:'🗼', cat:'politica',
+    title:'Rivoluzione Francese',
+    body:'Libertà, Uguaglianza, Fraternità. La presa della Bastiglia segna la fine dell\'ancien régime. La sovranità popolare sostituisce la monarchia assoluta, cambiando la politica mondiale.' },
+
+  { era:'Età Moderna', year:'1799–1815', icon:'⚔️', cat:'guerra',
+    title:'Napoleone Bonaparte',
+    body:'Da generale rivoluzionario a imperatore d\'Europa, Napoleone ridisegna la mappa del continente, esporta il codice civile moderno e cambia per sempre le regole della guerra.' },
+
+  { era:'Età Moderna', year:'1859', icon:'🐢', cat:'scienza',
+    title:'Evoluzione di Darwin',
+    body:'"L\'origine delle specie" spiega la diversità della vita con la selezione naturale, senza intervento divino. Una delle idee più rivoluzionarie e controverse della storia del pensiero.' },
+
+  { era:'Età Moderna', year:'1865', icon:'⛓️', cat:'politica',
+    title:'Abolizione della Schiavitù negli USA',
+    body:'Il XIII emendamento abolisce la schiavitù. Lincoln viene assassinato giorni dopo la resa del Sud. Inizia una lunga stagione di lotta per l\'uguaglianza razziale.' },
+
+  { era:'Età Moderna', year:'1869', icon:'🚢', cat:'tech',
+    title:'Canale di Suez',
+    body:'Il Canale collega Mediterraneo e Mar Rosso, accorciando di migliaia di km la rotta tra Europa e Asia. Il commercio globale cambia radicalmente: l\'Africa non è più da circumnavigare.' },
+
+  { era:'Età Moderna', year:'1876', icon:'📞', cat:'tech',
+    title:'Telefono di Bell',
+    body:'Bell brevetta il telefono: comunicazione vocale a distanza diventa realtà. In pochi decenni il telefono collegherà il mondo intero, preparando il terreno all\'era delle telecomunicazioni.' },
+
+  { era:'Età Moderna', year:'1879', icon:'💡', cat:'tech',
+    title:'Edison e la Lampadina',
+    body:'Edison perfeziona la lampadina a incandescenza. Insieme alle centrali elettriche che costruirà, illumina il mondo e rivoluziona la vita quotidiana di miliardi di persone.' },
+
+  { era:'Età Moderna', year:'1895', icon:'🎬', cat:'arte',
+    title:'Invenzione del Cinema',
+    body:'I fratelli Lumière proiettano i primi film a pagamento a Parigi. Nasce la settima arte, che diventerà il medium culturale più potente e diffuso del XX secolo.' },
+
+  { era:'Età Moderna', year:'1895', icon:'📡', cat:'scienza',
+    title:'Raggi X di Röntgen',
+    body:'Wilhelm Röntgen scopre i raggi X e ottiene la prima radiografia della mano della moglie. La medicina cambia per sempre: il corpo umano diventa trasparente alla scienza.' },
+
+  { era:'Età Moderna', year:'1903', icon:'✈️', cat:'tech',
+    title:'Primo Volo dei Fratelli Wright',
+    body:'A Kitty Hawk l\'aereo dei Wright percorre 37 metri in 12 secondi. In meno di 70 anni l\'uomo raggiungerà la Luna. Il cielo smette di essere il limite.' },
+
+  // ── ERA CONTEMPORANEA ───────────────────────
+  { era:'Era Contemporanea', year:'1905', icon:'⚛️', cat:'scienza',
+    title:'Anno Mirabile di Einstein',
+    body:'In un solo anno Einstein pubblica cinque articoli rivoluzionari: relatività ristretta, E=mc², effetto fotoelettrico, moto browniano. La fisica non sarà mai più la stessa.' },
+
+  { era:'Era Contemporanea', year:'1914–1918', icon:'🌐', cat:'guerra',
+    title:'Prima Guerra Mondiale',
+    body:'20 milioni di morti, l\'implosione di quattro imperi, l\'uso di gas tossici e trincee. Il conflitto più devastante della storia fino ad allora ridisegna la mappa del mondo.' },
+
+  { era:'Era Contemporanea', year:'1917', icon:'☭', cat:'politica',
+    title:'Rivoluzione Russa',
+    body:'I bolscevichi di Lenin prendono il potere. Nasce l\'URSS: primo stato marxista della storia. L\'esperimento comunista durerà 74 anni e influenzerà profondamente mezzo mondo.' },
+
+  { era:'Era Contemporanea', year:'1918', icon:'🦠', cat:'storia',
+    title:'Pandemia di Spagnola',
+    body:'L\'influenza uccide tra 50 e 100 milioni di persone in tutto il mondo, più della stessa guerra. È la pandemia più letale della storia moderna.' },
+
+  { era:'Era Contemporanea', year:'1928', icon:'🔬', cat:'scienza',
+    title:'Scoperta della Penicillina',
+    body:'Fleming osserva per caso che una muffa uccide i batteri. La penicillina, sviluppata negli anni \'40, salva decine di milioni di vite e dà inizio all\'era degli antibiotici.' },
+
+  { era:'Era Contemporanea', year:'1929', icon:'📉', cat:'politica',
+    title:'Grande Depressione',
+    body:'Il crollo di Wall Street innesca la peggiore crisi economica della storia. Milioni di disoccupati, ascesa dei fascismi, ridefinizione del ruolo dello stato nell\'economia.' },
+
+  { era:'Era Contemporanea', year:'1939–1945', icon:'💣', cat:'guerra',
+    title:'Seconda Guerra Mondiale',
+    body:'70–85 milioni di morti, la Shoah, le bombe atomiche su Hiroshima e Nagasaki. Il conflitto più distruttivo della storia ridisegna il mondo e porta alla nascita dell\'ONU.' },
+
+  { era:'Era Contemporanea', year:'1945', icon:'☢️', cat:'scienza',
+    title:'Bomba Atomica',
+    body:'Il Progetto Manhattan produce le prime bombe atomiche. Usate su Hiroshima e Nagasaki, causano 200.000 morti. L\'umanità acquisisce per la prima volta la capacità di distruggersi.' },
+
+  { era:'Era Contemporanea', year:'1947', icon:'🏳️', cat:'politica',
+    title:'Indipendenza dell\'India',
+    body:'Gandhi guida l\'India all\'indipendenza dal dominio britannico con la nonviolenza. La decolonizzazione si diffonde in Asia e Africa: decine di nuovi stati nascono nei decenni successivi.' },
+
+  { era:'Era Contemporanea', year:'1948', icon:'📋', cat:'politica',
+    title:'Dichiarazione Universale dei Diritti Umani',
+    body:'L\'ONU adotta la DUDU: 30 articoli che sanciscono diritti inalienabili per ogni essere umano. Un ideale non sempre rispettato, ma che rimane il punto di riferimento morale del mondo.' },
+
+  { era:'Era Contemporanea', year:'1953', icon:'🧬', cat:'scienza',
+    title:'Struttura del DNA',
+    body:'Watson e Crick descrivono la doppia elica del DNA. Nasce la biologia molecolare. Crick esclama: "abbiamo scoperto il segreto della vita." Medicina e biotecnologie cambiano per sempre.' },
+
+  { era:'Era Contemporanea', year:'1957', icon:'🛰️', cat:'spazio',
+    title:'Sputnik — Primo Satellite Artificiale',
+    body:'L\'URSS lancia lo Sputnik 1. Il segnale radio che trasmette mette in allarme l\'Occidente. Inizia la Corsa allo Spazio tra USA e URSS che porterà l\'uomo sulla Luna.' },
+
+  { era:'Era Contemporanea', year:'1961', icon:'👨‍🚀', cat:'spazio',
+    title:'Jurij Gagarin nello Spazio',
+    body:'Il cosmonauta sovietico compie il primo volo umano nello spazio in 108 minuti. "La Terra è blu": un momento che cambia per sempre la percezione dell\'umanità su se stessa.' },
+
+  { era:'Era Contemporanea', year:'1963', icon:'💔', cat:'politica',
+    title:'Assassinio di Kennedy',
+    body:'Il presidente Kennedy viene ucciso a Dallas. La sua morte segna la fine dell\'ottimismo kennedyano e rimane uno dei momenti più traumatici e controversi della storia americana.' },
+
+  { era:'Era Contemporanea', year:'1969', icon:'🚀', cat:'spazio',
+    title:'Sbarco sulla Luna',
+    body:'"Un piccolo passo per un uomo, un grande balzo per l\'umanità." Neil Armstrong cammina sulla Luna. 600 milioni di persone guardano in diretta. Il sogno più audace diventa realtà.' },
+
+  { era:'Era Contemporanea', year:'1989', icon:'🧱', cat:'politica',
+    title:'Caduta del Muro di Berlino',
+    body:'La notte del 9 novembre i berlinesi abbattono il muro che divide la città da 28 anni. Crolla il blocco sovietico, la Germania si riunifica, finisce la Guerra Fredda.' },
+
+  { era:'Era Contemporanea', year:'1990', icon:'🌐', cat:'tech',
+    title:'Nascita del World Wide Web',
+    body:'Tim Berners-Lee propone il WWW al CERN. Il primo sito va online nel 1991. In trent\'anni internet ridefinisce ogni aspetto della civiltà: comunicazione, commercio, cultura, politica.' },
+
+  { era:'Era Contemporanea', year:'2001', icon:'🗽', cat:'storia',
+    title:'11 Settembre 2001',
+    body:'Gli attacchi terroristici di Al-Qaeda uccidono 2.977 persone a New York e Washington. Gli USA dichiarano la "Guerra al Terrore": vent\'anni di conflitti ridisegnano il Medio Oriente.' },
+
+  { era:'Era Contemporanea', year:'2003', icon:'🧬', cat:'scienza',
+    title:'Mappatura del Genoma Umano',
+    body:'Completato il Progetto Genoma Umano: 3 miliardi di basi di DNA sequenziate. Si apre l\'era della medicina personalizzata, della genomica e delle terapie geniche.' },
+
+  { era:'Era Contemporanea', year:'2007', icon:'📱', cat:'tech',
+    title:'Lancio dell\'iPhone',
+    body:'Apple presenta l\'iPhone: computer tascabile, telefono e internet in un oggetto. In quindici anni trasforma comunicazione, fotografia, musica, navigazione, commercio e relazioni sociali.' },
+
+  { era:'Era Contemporanea', year:'2012', icon:'⚛️', cat:'scienza',
+    title:'Scoperta del Bosone di Higgs',
+    body:'Al CERN viene rilevato il bosone di Higgs: la particella che conferisce massa alla materia. La fisica delle particelle completa il Modello Standard dopo decenni di ricerca.' },
+
+  { era:'Era Contemporanea', year:'2015', icon:'☀️', cat:'politica',
+    title:'Accordo di Parigi sul Clima',
+    body:'195 paesi firmano l\'accordo per limitare il riscaldamento globale a 1,5°C. È il primo trattato climatico universale: ambizioso nei numeri, controverso nei meccanismi di attuazione.' },
+
+  { era:'Era Contemporanea', year:'2019–2022', icon:'🦠', cat:'storia',
+    title:'Pandemia di COVID-19',
+    body:'Il virus SARS-CoV-2 causa una pandemia globale con oltre 7 milioni di morti. Vaccini mRNA sviluppati in tempi record, telelavoro di massa, crisi delle catene di fornitura.' },
+
+  { era:'Era Contemporanea', year:'2022–oggi', icon:'🤖', cat:'tech',
+    title:'Rivoluzione dell\'Intelligenza Artificiale',
+    body:'ChatGPT, Gemini, Claude: i grandi modelli linguistici irrompono nella vita quotidiana. Una trasformazione tecnologica paragonabile all\'invenzione di internet, con implicazioni tutte da scrivere.' },
+
+];
+
+// ════════════════════════════════════════════════
+//  MOTORE DI RENDERING — non modificare
+// ════════════════════════════════════════════════
+const TAG_LABELS = {
+  storia:'Storia', scienza:'Scienza', arte:'Arte & Cultura',
+  esplora:'Esplorazioni', guerra:'Guerra', politica:'Politica',
+  tech:'Tecnologia', spazio:'Spazio'
+};
+
+function buildTimeline(filter) {
+  const container = document.getElementById('timeline');
+  const noResults = document.getElementById('no-results');
+  container.innerHTML = '';
+
+  const filtered = filter === 'all' ? EVENTS : EVENTS.filter(e => e.cat === filter);
+
+  if (filtered.length === 0) {
+    noResults.style.display = 'block';
+    document.getElementById('event-count').textContent = '';
+    return;
+  }
+  noResults.style.display = 'none';
+  document.getElementById('event-count').textContent =
+    `${filtered.length} event${filtered.length === 1 ? 'o' : 'i'} ${filter === 'all' ? 'totali' : '· ' + TAG_LABELS[filter]}`;
+
+  let currentEra = null;
+  let sideIndex  = 0;
+
+  filtered.forEach(ev => {
+    if (ev.era !== currentEra) {
+      currentEra = ev.era;
+      sideIndex = 0;
+      const era = document.createElement('div');
+      era.className = 'era-label';
+      era.innerHTML = `<span>${currentEra}</span>`;
+      container.appendChild(era);
+    }
+
+    const side = sideIndex % 2 === 0 ? 'right' : 'left';
+    sideIndex++;
+
+    const el = document.createElement('div');
+    el.className = `event ${side}`;
+
+    const cardHTML = `
+      <span class="card-icon">${ev.icon}</span>
+      <div class="card-year">${ev.year}</div>
+      <div class="card-title">${ev.title}</div>
+      <div class="card-body">${ev.body}</div>
+      <span class="card-tag tag-${ev.cat}">${TAG_LABELS[ev.cat]}</span>
+    `;
+
+    el.innerHTML = side === 'right'
+      ? `<div class="spacer"></div><div class="node"><div class="node-dot"></div></div><div class="card">${cardHTML}</div>`
+      : `<div class="card">${cardHTML}</div><div class="node"><div class="node-dot"></div></div>`;
+
+    container.appendChild(el);
+  });
+
+  // scroll-triggered animations
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  container.querySelectorAll('.event').forEach(ev => obs.observe(ev));
+}
+
+// boot
+buildTimeline('all');
+
+// filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    buildTimeline(btn.dataset.filter);
+    window.scrollTo({ top: document.getElementById('timeline').offsetTop - 80, behavior: 'smooth' });
+  });
+});
+</script>
+</body>
+</html>
